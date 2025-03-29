@@ -5,9 +5,7 @@ import kotlinx.coroutines.flow.Flow
 class OfflineGoalsRepository(private val goalDao: GoalDao) : GoalRepository {
     override fun getAllGoals(): Flow<List<Goal>> = goalDao.getAllGoals()
 
-    override suspend fun insertItem(item: Goal) = goalDao.insert(item)
+    override suspend fun insertGoal(goal: Goal) = goalDao.insertGoal(goal)
 
-    override suspend fun deleteItem(item: Goal) = itemDao.delete(item)
-
-    override suspend fun updateItem(item: Item) = itemDao.update(item)
+    override suspend fun deleteGoal(goal: Goal) = goalDao.deleteGoal(goal)
 }
