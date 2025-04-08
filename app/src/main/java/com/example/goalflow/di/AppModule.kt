@@ -1,0 +1,36 @@
+package com.example.goalflow.di
+
+import android.app.Application
+import androidx.room.Room
+import com.example.goalflow.data.GoalDao
+import com.example.goalflow.data.GoalFlowDatabase
+import com.example.goalflow.data.GoalRepository
+import com.example.goalflow.data.RealGoalRepository
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object AppModule {
+    @Provides
+    @Singleton
+    fun provideDatabase(app: Application): GoalFlowDatabase {
+        return Room.databaseBuilder(
+            app,
+            GoalFlowDatabase::class.java,
+            "goalflow_db"
+        ).build()
+    }
+
+    @Provides
+    fun provideGoalDao(db: GoalFlowDatabase): GoalDao = db.goalDao()
+
+    @Provides
+    @Singleton
+    fun provideGoalRepository(dao: GoalDao): GoalRepository {
+        return RealGoalRepository(dao)
+    }
+}
