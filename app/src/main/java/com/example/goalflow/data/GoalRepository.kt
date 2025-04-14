@@ -3,7 +3,7 @@ package com.example.goalflow.data
 import kotlinx.coroutines.flow.Flow
 
 interface GoalRepository {
-    suspend fun getAllGoals(): List<Goal>
+    val allGoals: Flow<List<Goal>>
 
     suspend fun insertGoal(goal: Goal)
 

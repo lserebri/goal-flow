@@ -4,10 +4,10 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
-
     namespace = "com.example.goalflow"
     compileSdk = 35
 
@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -62,7 +61,10 @@ dependencies {
 
     //Hilt
     implementation("com.google.dagger:hilt-android:2.55")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
     ksp("com.google.dagger:hilt-android-compiler:2.55")
+
 
     //Room
     implementation(libs.room.runtime)
