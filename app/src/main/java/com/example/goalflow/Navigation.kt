@@ -16,8 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
-import com.example.goalflow.ui.GoalListScreen
-import com.example.goalflow.ui.HomeScreen
+import com.example.goalflow.ui.consumable.ConsumableListScreen
+import com.example.goalflow.ui.goal.GoalListScreen
+import com.example.goalflow.ui.home.HomeScreen
 
 data class TopLevelRoute(
     val name: String,
@@ -66,7 +67,7 @@ fun Navigation() {
         ) {
             composable("home") { HomeScreen() }
             composable("goals") { GoalListScreen() }
-//            composable("consumables") { ConsumablesmablesScreen() }
+            composable("consumables") { ConsumableListScreen() }
         }
     }
 }

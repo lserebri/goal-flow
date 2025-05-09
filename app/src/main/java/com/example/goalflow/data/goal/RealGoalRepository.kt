@@ -1,6 +1,5 @@
-package com.example.goalflow.data
+package com.example.goalflow.data.goal
 
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class RealGoalRepository @Inject constructor(

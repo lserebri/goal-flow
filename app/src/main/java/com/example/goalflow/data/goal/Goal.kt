@@ -1,4 +1,4 @@
-package com.example.goalflow.data
+package com.example.goalflow.data.goal
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

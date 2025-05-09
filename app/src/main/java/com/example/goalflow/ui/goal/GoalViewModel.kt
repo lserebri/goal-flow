@@ -1,11 +1,11 @@
-package com.example.goalflow.ui
+package com.example.goalflow.ui.goal
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.goalflow.data.Goal
-import com.example.goalflow.data.GoalRepository
-import com.example.goalflow.ui.GoalUiState.*
-import com.example.goalflow.ui.GoalUiState.Success
+import com.example.goalflow.data.goal.Goal
+import com.example.goalflow.data.goal.GoalRepository
+import com.example.goalflow.ui.goal.GoalUiState.*
+import com.example.goalflow.ui.goal.GoalUiState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

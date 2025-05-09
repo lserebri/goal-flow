@@ -1,4 +1,4 @@
-package com.example.goalflow.data
+package com.example.goalflow.data.goal
 
 import kotlinx.coroutines.flow.Flow
 

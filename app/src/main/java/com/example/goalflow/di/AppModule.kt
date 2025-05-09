@@ -2,10 +2,13 @@ package com.example.goalflow.di
 
 import android.app.Application
 import androidx.room.Room
-import com.example.goalflow.data.GoalDao
+import com.example.goalflow.data.goal.GoalDao
 import com.example.goalflow.data.GoalFlowDatabase
-import com.example.goalflow.data.GoalRepository
-import com.example.goalflow.data.RealGoalRepository
+import com.example.goalflow.data.consumable.ConsumableDao
+import com.example.goalflow.data.consumable.ConsumableRepository
+import com.example.goalflow.data.consumable.RealConsumableRepository
+import com.example.goalflow.data.goal.GoalRepository
+import com.example.goalflow.data.goal.RealGoalRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +25,9 @@ object AppModule {
             app,
             GoalFlowDatabase::class.java,
             "goalflow_db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
@@ -32,5 +37,14 @@ object AppModule {
     @Singleton
     fun provideGoalRepository(dao: GoalDao): GoalRepository {
         return RealGoalRepository(dao)
+    }
+
+    @Provides
+    fun provideConsumableDao(db: GoalFlowDatabase): ConsumableDao = db.consumableDao()
+
+    @Provides
+    @Singleton
+    fun provideConsumableRepository(dao: ConsumableDao): ConsumableRepository {
+        return RealConsumableRepository(dao)
     }
 }
