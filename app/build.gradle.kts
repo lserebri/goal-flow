@@ -59,14 +59,18 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    //Hilt
+    // Hilt
     implementation("com.google.dagger:hilt-android:2.55")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-
     ksp("com.google.dagger:hilt-android-compiler:2.55")
 
+    // Fragment
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.8.9")
 
-    //Room
+    // Navigation
+    implementation ("androidx.navigation:navigation-ui-ktx:2.8.9")
+
+    // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
