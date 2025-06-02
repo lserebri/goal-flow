@@ -30,7 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.ui.action.ActionIcon
-import com.example.goalflow.ui.action.SwipeableItemWithAction
+import com.example.goalflow.ui.action.SwappableItemWithAction
 
 
 @Composable
@@ -54,7 +54,7 @@ fun GoalListScreen(goalViewModel: GoalViewModel = hiltViewModel()) {
     ) {
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(goalUIList) { goalUI ->
-                SwipeableItemWithAction(
+                SwappableItemWithAction(
                     isRevealed = goalUI.isOptionsRevealed,
                     onExpanded = {
                         goalUIList = goalUIList.map {

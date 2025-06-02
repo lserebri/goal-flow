@@ -54,7 +54,7 @@ fun ActionIcon(
 }
 
 @Composable
-fun SwipeableItemWithAction(
+fun SwappableItemWithAction(
     isRevealed: Boolean,
     actions: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
