@@ -9,6 +9,9 @@ import com.example.goalflow.data.consumable.ConsumableRepository
 import com.example.goalflow.data.consumable.RealConsumableRepository
 import com.example.goalflow.data.goal.GoalRepository
 import com.example.goalflow.data.goal.RealGoalRepository
+import com.example.goalflow.data.score.RealScoreRepository
+import com.example.goalflow.data.score.ScoreDao
+import com.example.goalflow.data.score.ScoreRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -46,5 +49,14 @@ object AppModule {
     @Singleton
     fun provideConsumableRepository(dao: ConsumableDao): ConsumableRepository {
         return RealConsumableRepository(dao)
+    }
+
+    @Provides
+    fun provideScoreDao(db: GoalFlowDatabase): ScoreDao = db.scoreDao()
+
+    @Provides
+    @Singleton
+    fun provideScoreRepository(dao: ScoreDao): ScoreRepository {
+        return RealScoreRepository(dao)
     }
 }

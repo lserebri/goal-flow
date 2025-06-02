@@ -65,10 +65,14 @@ dependencies {
     ksp("com.google.dagger:hilt-android-compiler:2.55")
 
     // Fragment
-    implementation ("androidx.navigation:navigation-fragment-ktx:2.8.9")
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.9.0")
 
     // Navigation
-    implementation ("androidx.navigation:navigation-ui-ktx:2.8.9")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.9.0")
+
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
 
     // Room
     implementation(libs.room.runtime)

@@ -6,9 +6,16 @@ import com.example.goalflow.data.consumable.Consumable
 import com.example.goalflow.data.consumable.ConsumableDao
 import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.data.goal.GoalDao
+import com.example.goalflow.data.score.Score
+import com.example.goalflow.data.score.ScoreDao
 
-@Database(entities = [Goal::class, Consumable::class], version = 2, exportSchema = false)
+@Database(
+    entities = [Goal::class, Consumable::class, Score::class],
+    version = 4,
+    exportSchema = false
+)
 abstract class GoalFlowDatabase : RoomDatabase() {
     abstract fun goalDao(): GoalDao
     abstract fun consumableDao(): ConsumableDao
+    abstract fun scoreDao(): ScoreDao
 }

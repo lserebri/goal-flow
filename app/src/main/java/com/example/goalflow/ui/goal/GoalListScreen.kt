@@ -1,7 +1,5 @@
 package com.example.goalflow.ui.goal
 
-import android.util.Log
-import androidx.compose.foundation.clickable
 import androidx.hilt.navigation.compose.hiltViewModel
 
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -25,20 +26,64 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.goalflow.data.goal.Goal
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.graphics.Color
+import com.example.goalflow.data.goal.Goal
+import com.example.goalflow.ui.action.ActionIcon
+import com.example.goalflow.ui.action.SwipeableItemWithAction
+
 
 @Composable
 fun GoalListScreen(goalViewModel: GoalViewModel = hiltViewModel()) {
+
     val uiState by goalViewModel.allGoals.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
+    var goalUIList by remember { mutableStateOf(listOf<GoalUI>()) }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        if (uiState is GoalUiState.Success) {
-            val goals = (uiState as GoalUiState.Success).data
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(goals) { goal ->
-                    GoalItem(goal = goal, onDelete = { goalViewModel.deleteGoal(goal) })
+    if (uiState is GoalUiState.Success) {
+        val goals = (uiState as GoalUiState.Success).data
+        goalUIList = remember(goals) {
+            goals.map { GoalUI(it) }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        LazyColumn(modifier = Modifier.weight(1f)) {
+            items(goalUIList) { goalUI ->
+                SwipeableItemWithAction(
+                    isRevealed = goalUI.isOptionsRevealed,
+                    onExpanded = {
+                        goalUIList = goalUIList.map {
+                            if (it.goal.id == goalUI.goal.id) it.copy(isOptionsRevealed = true)
+                            else it.copy(isOptionsRevealed = false)
+                        }
+                    },
+                    onCollapsed = {
+                        goalUIList = goalUIList.map {
+                            if (it.goal.id == goalUI.goal.id) it.copy(isOptionsRevealed = false)
+                            else it
+                        }
+                    },
+                    actions = {
+                        ActionIcon(
+                            onClick = {
+                                goalViewModel.deleteGoal(goalUI.goal)
+                            },
+                            backgroundColor = Color.Red,
+                            icon = Icons.Default.Delete
+                        )
+                        ActionIcon(
+                            onClick = { },
+                            backgroundColor = Color.Yellow,
+                            icon = Icons.Default.Edit
+                        )
+                    }
+                ) {
+                    GoalItem(goal = goalUI.goal)
                 }
             }
         }
@@ -59,20 +104,21 @@ fun GoalListScreen(goalViewModel: GoalViewModel = hiltViewModel()) {
     }
 }
 
-
 @Composable
-fun GoalItem(goal: Goal, onDelete: () -> Unit) {
+fun GoalItem(goal: Goal) {
     Row(
         modifier = Modifier.Companion
             .fillMaxWidth()
-            .padding(8.dp)
-            .clickable {
-                Log.d("GoalItem", "Clicked on ${goal.name}")
-                onDelete()
-            },
+            .padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = goal.name)
+//        Button(
+//            onClick = { inputTime() },
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Text("Add Goal")
+//        }
         Text(text = "Weight: ${goal.weight}")
     }
 }

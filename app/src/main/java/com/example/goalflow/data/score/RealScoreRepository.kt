@@ -1,0 +1,12 @@
+package com.example.goalflow.data.score
+
+import jakarta.inject.Inject
+import kotlinx.coroutines.flow.Flow
+
+class RealScoreRepository @Inject constructor(
+    private val scoreDao: ScoreDao
+): ScoreRepository {
+    override val getScore = scoreDao.getScore()
+
+    override suspend fun updateScore(score: Score) = scoreDao.updateScore(score)
+}
