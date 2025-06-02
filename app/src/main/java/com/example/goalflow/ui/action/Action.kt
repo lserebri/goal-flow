@@ -17,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -63,7 +64,7 @@ fun SwappableItemWithAction(
     content: @Composable () -> Unit
 ) {
     var contextMenuWidth by remember {
-        mutableStateOf(0f)
+        mutableFloatStateOf(0f)
     }
     val offset = remember {
         Animatable(initialValue = 0f)
@@ -72,7 +73,7 @@ fun SwappableItemWithAction(
 
     LaunchedEffect(key1 = isRevealed, contextMenuWidth) {
         if (isRevealed) {
-            offset.animateTo(contextMenuWidth)
+            offset.animateTo(-contextMenuWidth)
         } else {
             offset.animateTo(0f)
         }
@@ -86,6 +87,7 @@ fun SwappableItemWithAction(
     {
         Row(
             modifier = Modifier
+                .align(Alignment.CenterEnd)
                 .onSizeChanged {
                     contextMenuWidth = it.width.toFloat()
                 },
@@ -102,15 +104,15 @@ fun SwappableItemWithAction(
                         onHorizontalDrag = { _, dragAmount ->
                             scope.launch {
                                 val newOffset = (offset.value + dragAmount)
-                                    .coerceIn(0f, contextMenuWidth)
+                                    .coerceIn(-contextMenuWidth, 0f)
                                 offset.snapTo(newOffset)
                             }
                         },
                         onDragEnd = {
                             when {
-                                offset.value >= contextMenuWidth / 2 -> {
+                                offset.value < -contextMenuWidth / 2 -> {
                                     scope.launch {
-                                        offset.animateTo(contextMenuWidth)
+                                        offset.animateTo(-contextMenuWidth)
                                         onExpanded()
                                     }
                                 }
