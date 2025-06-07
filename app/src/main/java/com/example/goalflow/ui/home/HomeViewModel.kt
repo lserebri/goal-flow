@@ -3,8 +3,7 @@ package com.example.goalflow.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.goalflow.data.score.ScoreRepository
-import com.example.goalflow.ui.consumable.ConsumableViewModel
-import com.example.goalflow.ui.goal.GoalViewModel
+import com.example.goalflow.ui.home.ScoreUiState.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,12 +19,9 @@ class HomeViewModel @Inject constructor(
 //    private val consumableViewModel: ConsumableViewModel
 ): ViewModel() {
     val score: StateFlow<ScoreUiState> = scoreRepository
-        .getScore
-        .map< Int?, ScoreUiState> { ScoreUiState.Success(it) }
-        .catch { emit(ScoreUiState.Error(it)) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ScoreUiState.Loading)
-
-
+        .getScore.map<Int, ScoreUiState> (::Success)
+        .catch { emit(Error(it)) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
 }
 
 

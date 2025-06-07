@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 class RealScoreRepository @Inject constructor(
     private val scoreDao: ScoreDao
 ): ScoreRepository {
-    override val getScore = scoreDao.getScore()
+    override val getScore: Flow<Int> = scoreDao.getScore()
 
     override suspend fun updateScore(score: Score) = scoreDao.updateScore(score)
 }
