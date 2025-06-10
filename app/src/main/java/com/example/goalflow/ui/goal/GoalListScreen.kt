@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -94,9 +95,13 @@ fun GoalListScreen(goalViewModel: GoalViewModel = hiltViewModel()) {
             }
         }
 
+//        Spacer(modifier = Modifier.size(50.dp))
+
+
         Button(
             onClick = { showDialog = true },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
             Text("Add Goal")
         }
