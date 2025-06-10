@@ -2,26 +2,43 @@ package com.example.goalflow.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.goalflow.data.score.Score
 import com.example.goalflow.data.score.ScoreRepository
 import com.example.goalflow.ui.home.ScoreUiState.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val scoreRepository: ScoreRepository,
-//    private val goalViewModel: GoalViewModel,
-//    private val consumableViewModel: ConsumableViewModel
 ): ViewModel() {
     val score: StateFlow<ScoreUiState> = scoreRepository
         .getScore.map<Int, ScoreUiState> (::Success)
         .catch { emit(Error(it)) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
+
+    fun updateScore(minutes: Int, weight: Int, isGoal: Boolean) {
+        viewModelScope.launch {
+            val currentScore = scoreRepository.getScore.first()
+
+            val deltaPoints = ((minutes.toFloat() / 60f) * weight).toInt()
+
+            val newScore = if (isGoal) {
+                currentScore + deltaPoints
+            } else {
+                (currentScore - deltaPoints).coerceAtLeast(0)
+            }
+
+            scoreRepository.updateScore(Score(score = newScore))
+        }
+    }
 }
 
 

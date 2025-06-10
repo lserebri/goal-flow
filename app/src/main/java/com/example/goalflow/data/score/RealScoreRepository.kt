@@ -8,5 +8,5 @@ class RealScoreRepository @Inject constructor(
 ): ScoreRepository {
     override val getScore: Flow<Int> = scoreDao.getScore()
 
-    override suspend fun updateScore(score: Score) = scoreDao.updateScore(score)
+    override suspend fun updateScore(score: Score) = scoreDao.updateScore(score.copy(id = 0))
 }

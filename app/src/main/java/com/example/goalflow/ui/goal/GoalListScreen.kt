@@ -1,5 +1,6 @@
 package com.example.goalflow.ui.goal
 
+import androidx.compose.foundation.clickable
 import androidx.hilt.navigation.compose.hiltViewModel
 
 import androidx.compose.foundation.layout.Arrangement
@@ -17,8 +18,13 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,11 +37,11 @@ import androidx.compose.ui.graphics.Color
 import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.ui.action.ActionIcon
 import com.example.goalflow.ui.action.SwappableItemWithAction
+import com.example.goalflow.ui.home.HomeViewModel
 
 
 @Composable
 fun GoalListScreen(goalViewModel: GoalViewModel = hiltViewModel()) {
-
     val uiState by goalViewModel.allGoals.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var goalUIList by remember { mutableStateOf(listOf<GoalUI>()) }
@@ -104,22 +110,67 @@ fun GoalListScreen(goalViewModel: GoalViewModel = hiltViewModel()) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GoalItem(goal: Goal) {
+fun TimePickerDialog(
+    onConfirm: (TimePickerState) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val timePickerState = rememberTimePickerState(
+        initialHour = 0,
+        initialMinute = 0,
+        is24Hour = true,
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        dismissButton = {
+            TextButton(onClick = { onDismiss() }) {
+                Text("Dismiss")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(timePickerState) }) {
+                Text("OK")
+            }
+        },
+        text = {
+            TimePicker(
+                state = timePickerState,
+            )
+        }
+    )
+}
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GoalItem(goal: Goal, homeViewModel: HomeViewModel = hiltViewModel()) {
+    var showDialog by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier.Companion
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable { showDialog = true },
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = goal.name)
-//        Button(
-//            onClick = { inputTime() },
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Text("Add Goal")
-//        }
         Text(text = "Weight: ${goal.weight}")
+    }
+    if (showDialog) {
+        TimePickerDialog(
+            onDismiss = { showDialog = false },
+            onConfirm = {
+                homeViewModel.updateScore(
+                    ((it.hour * 60) + it.minute),
+                    goal.weight,
+                    isGoal = true,
+                )
+                showDialog = false
+            }
+        )
     }
 }
 

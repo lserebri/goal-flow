@@ -11,7 +11,7 @@ import com.example.goalflow.data.score.ScoreDao
 
 @Database(
     entities = [Goal::class, Consumable::class, Score::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class GoalFlowDatabase : RoomDatabase() {
