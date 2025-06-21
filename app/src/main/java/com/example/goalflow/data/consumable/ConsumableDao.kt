@@ -5,16 +5,18 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.goalflow.data.activity.ActivityDao
+import com.example.goalflow.data.activity.ActivityItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface ConsumableDao {
+interface ConsumableDao : ActivityDao<Consumable> {
     @Query("SELECT * FROM consumable")
-    fun getAllConsumables(): Flow<List<Consumable>>
+    override fun getAll(): Flow<List<Consumable>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertConsumable(consumable: Consumable)
+    override suspend fun insert(consumable: Consumable)
 
     @Delete
-    suspend fun deleteConsumable(consumable: Consumable)
+    override suspend fun delete(consumable: Consumable)
 }

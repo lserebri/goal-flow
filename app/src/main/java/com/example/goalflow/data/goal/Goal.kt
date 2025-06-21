@@ -2,12 +2,19 @@ package com.example.goalflow.data.goal
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.goalflow.data.activity.ActivityItem
+
+data class ActivityItem (
+    val id: Int,
+    val name: String,
+    val weight: Int
+)
 
 @Entity(tableName = "goals")
 data class Goal(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    override val id: Int = 0,
 
-    val name: String,
-    val weight: Int,
-)
+    override val name: String,
+    override val weight: Int,
+) : ActivityItem

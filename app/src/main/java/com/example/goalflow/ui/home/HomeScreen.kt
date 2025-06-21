@@ -25,10 +25,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
-import com.example.goalflow.ui.consumable.ConsumableListScreen
-import com.example.goalflow.ui.goal.GoalListScreen
+import androidx.navigation.navArgument
+import com.example.goalflow.ui.activity.ActivityListScreen
 
 data class Destination(
     val name: String,
@@ -45,7 +46,9 @@ val destinations = listOf(
 fun NavigationTab(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val startDestination = Destination("Goals", "goals")
-    var selectedDestination by rememberSaveable { mutableIntStateOf(destinations.indexOf(startDestination)) }
+    var selectedDestination by rememberSaveable {
+        mutableIntStateOf(destinations.indexOf(startDestination))
+    }
 
     Column(modifier = modifier) {
         SecondaryTabRow(selectedTabIndex = selectedDestination) {
@@ -53,7 +56,12 @@ fun NavigationTab(modifier: Modifier = Modifier) {
                 Tab(
                     selected = selectedDestination == index,
                     onClick = {
-                        navController.navigate(destination.route) {
+                        val route = if (destination.route == "goals") {
+                            "goals?isFirstTab=true"
+                        } else {
+                            "consumables?isFirstTab=false"
+                        }
+                        navController.navigate(route) {
                             // Avoid building up a back stack of tabs
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
@@ -74,15 +82,34 @@ fun NavigationTab(modifier: Modifier = Modifier) {
             }
         }
 
-        NavHost(navController = navController, startDestination = "goals", modifier = Modifier.weight(1f)) {
-            composable("goals") { GoalListScreen() }
-            composable("consumables") { ConsumableListScreen() }
+        NavHost(
+            navController = navController,
+            startDestination = "goals",
+            modifier = Modifier.weight(1f)
+        ) {
+            composable(
+                "goals?isFirstTab={isFirstTab}",
+                arguments = listOf(navArgument("isFirstTab") {
+                    type = NavType.BoolType
+                    defaultValue = true
+                })
+            ) {
+                ActivityListScreen(isGoal = true)
+            }
+
+            composable(
+                "consumables?isFirstTab={isFirstTab}",
+                arguments = listOf(navArgument("isFirstTab") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                })
+            ) {
+                ActivityListScreen(isGoal = false)
+            }
         }
     }
 }
 
-
-@Preview
 @Composable
 fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
     val uiState by homeViewModel.score.collectAsState()
@@ -100,7 +127,7 @@ fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = 20.dp)
-                        .weight(0.1f), // Top section for score
+                        .weight(0.2f), // Top section for score
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -110,10 +137,9 @@ fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
                     )
                 }
 
-                Spacer(modifier = Modifier.size(100.dp))
+//                Spacer(modifier = Modifier.size(100.dp))
 
-
-                NavigationTab(modifier = Modifier.weight(0.5f)) // Remaining space for tab navigation
+                NavigationTab(modifier = Modifier.weight(0.3f))
             }
         }
     }

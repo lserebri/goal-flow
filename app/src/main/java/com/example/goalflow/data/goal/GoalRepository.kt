@@ -1,11 +1,16 @@
 package com.example.goalflow.data.goal
 
+import com.example.goalflow.data.activity.ActivityRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-interface GoalRepository {
-    val allGoals: Flow<List<Goal>>
+class GoalRepository @Inject constructor(
+    private val goalDao: GoalDao
+) : ActivityRepository<Goal>(goalDao) {
+    override val getAll: Flow<List<Goal>> = goalDao.getAll()
 
-    suspend fun insertGoal(goal: Goal)
+    override suspend fun insert(activity: Goal) = goalDao.insert(activity)
 
-    suspend fun deleteGoal(goal: Goal)
+    override suspend fun delete(activity: Goal) = goalDao.delete(activity)
 }
+

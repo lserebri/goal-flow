@@ -1,11 +1,15 @@
 package com.example.goalflow.data.consumable
 
+import com.example.goalflow.data.activity.ActivityRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-interface ConsumableRepository {
-    val allConsumables: Flow<List<Consumable>>
+class ConsumableRepository @Inject constructor(
+    private val consumableDao: ConsumableDao
+) : ActivityRepository<Consumable>(consumableDao) {
+    override val getAll: Flow<List<Consumable>> = consumableDao.getAll()
 
-    suspend fun insertConsumable(consumable: Consumable)
+    override suspend fun insert(activity: Consumable) = consumableDao.insert(activity)
 
-    suspend fun deleteConsumable(consumable: Consumable)
+    override suspend fun delete(activity: Consumable) = consumableDao.delete(activity)
 }
