@@ -1,5 +1,6 @@
 package com.example.goalflow.ui.activity
 
+import TimePickerDialog
 import androidx.compose.foundation.clickable
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -34,16 +35,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.sp
 import com.example.goalflow.data.activity.ActivityItem
 import com.example.goalflow.data.consumable.Consumable
 import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.ui.action.ActionIcon
 import com.example.goalflow.ui.action.SwappableItemWithAction
 import com.example.goalflow.ui.home.HomeViewModel
-
-
 @Composable
 fun ActivityListScreen(
 	isGoal: Boolean,
@@ -57,8 +58,9 @@ fun ActivityListScreen(
 	if (uiState is ActivityUIState.Success) {
 		val activities = (uiState as ActivityUIState.Success).data
 		activityUIList = remember(activities) {
-			activities.map { ActivityUI(it) }
+			activities.map { ActivityUI(it) }.sortedByDescending { it.activity.weight }
 		}
+
 	}
 
 	Column(
@@ -125,37 +127,37 @@ fun ActivityListScreen(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TimePickerDialog(
-	onConfirm: (TimePickerState) -> Unit,
-	onDismiss: () -> Unit,
-) {
-	val timePickerState = rememberTimePickerState(
-		initialHour = 0,
-		initialMinute = 0,
-		is24Hour = true,
-	)
-
-	AlertDialog(
-		onDismissRequest = onDismiss,
-		dismissButton = {
-			TextButton(onClick = { onDismiss() }) {
-				Text("Dismiss")
-			}
-		},
-		confirmButton = {
-			TextButton(onClick = { onConfirm(timePickerState) }) {
-				Text("OK")
-			}
-		},
-		text = {
-			TimePicker(
-				state = timePickerState,
-			)
-		}
-	)
-}
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun TimePickerDialog(
+//	onConfirm: (TimePickerState) -> Unit,
+//	onDismiss: () -> Unit,
+//) {
+//	val timePickerState = rememberTimePickerState(
+//		initialHour = 0,
+//		initialMinute = 0,
+//		is24Hour = true,
+//	)
+//
+//	AlertDialog(
+//		onDismissRequest = onDismiss,
+//		dismissButton = {
+//			TextButton(onClick = { onDismiss() }) {
+//				Text("Dismiss")
+//			}
+//		},
+//		confirmButton = {
+//			TextButton(onClick = { onConfirm(timePickerState) }) {
+//				Text("OK")
+//			}
+//		},
+//		text = {
+//			TimePicker(
+//				state = timePickerState,
+//			)
+//		}
+//	)
+//}
 
 
 
@@ -167,6 +169,7 @@ fun ActivityItemComposable(
 	homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 	var showDialog by remember { mutableStateOf(false) }
+
 
 	Row(
 		modifier = Modifier
@@ -181,11 +184,26 @@ fun ActivityItemComposable(
 
 	// ✅ Shared time picker that uses isGoal to adjust score calculation
 	if (showDialog) {
+//		TimePickerDialog(
+//			onDismiss = { showDialog = false },
+//			onConfirm = {
+//				homeViewModel.updateScore(
+//					((it.hour * 60) + it.minute),
+//					activity.weight,
+//					isGoal = isGoal
+//				)
+//				showDialog = false
+//			}
+//		)
+
+
 		TimePickerDialog(
+			initialHour = 0,
+			initialMinute = 0,
 			onDismiss = { showDialog = false },
-			onConfirm = {
+			onConfirm = { hour, minute ->
 				homeViewModel.updateScore(
-					((it.hour * 60) + it.minute),
+					(hour * 60 + minute),
 					activity.weight,
 					isGoal = isGoal
 				)
