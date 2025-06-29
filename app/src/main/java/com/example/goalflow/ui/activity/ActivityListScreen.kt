@@ -3,28 +3,20 @@ package com.example.goalflow.ui.activity
 import TimePickerDialog
 import androidx.compose.foundation.clickable
 import androidx.hilt.navigation.compose.hiltViewModel
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,14 +26,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType
 import com.example.goalflow.data.activity.ActivityItem
 import com.example.goalflow.data.consumable.Consumable
 import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.ui.action.ActionIcon
 import com.example.goalflow.ui.action.SwappableItemWithAction
+import com.example.goalflow.ui.components.ActivityDialog
 import com.example.goalflow.ui.components.DeleteConfirmationDialog
 import com.example.goalflow.ui.home.HomeViewModel
+
 @Composable
 fun ActivityListScreen(
 	isGoal: Boolean,
@@ -56,13 +49,11 @@ fun ActivityListScreen(
 
 	var activityUIList by remember { mutableStateOf(listOf<ActivityUI>()) }
 
-	// ✅ Update: Observing list based on ViewModel
 	if (uiState is ActivityUIState.Success) {
 		val activities = (uiState as ActivityUIState.Success).data
 		activityUIList = remember(activities) {
 			activities.map { ActivityUI(it) }.sortedByDescending { it.activity.weight }
 		}
-
 	}
 
 	Column(
@@ -210,48 +201,3 @@ fun ActivityItemComposable(
 		)
 	}
 }
-
-
-@Composable
-fun ActivityDialog(
-	onDismiss: () -> Unit,
-	onSave: (String, Int) -> Unit,
-	initialName: String = "",
-	initialWeight: Int = 1
-) {
-	var name by remember { mutableStateOf(initialName) }
-	var weight by remember { mutableStateOf(initialWeight.toString()) }
-
-	AlertDialog(
-		onDismissRequest = onDismiss,
-		title = { Text(if (initialName.isEmpty()) "Add Activity" else "Edit Activity") },
-		text = {
-			Column {
-				OutlinedTextField(
-					value = name,
-					onValueChange = { name = it },
-					label = { Text("Name") }
-				)
-				OutlinedTextField(
-					value = weight,
-					onValueChange = { weight = it },
-					label = { Text("Weight") },
-					keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-				)
-			}
-		},
-		confirmButton = {
-			TextButton(onClick = {
-				onSave(name, weight.toIntOrNull() ?: 1)
-			}) {
-				Text("Save")
-			}
-		},
-		dismissButton = {
-			TextButton(onClick = onDismiss) {
-				Text("Cancel")
-			}
-		}
-	)
-}
-
