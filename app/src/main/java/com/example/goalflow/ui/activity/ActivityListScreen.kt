@@ -21,12 +21,10 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,15 +33,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.sp
 import com.example.goalflow.data.activity.ActivityItem
 import com.example.goalflow.data.consumable.Consumable
 import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.ui.action.ActionIcon
 import com.example.goalflow.ui.action.SwappableItemWithAction
+import com.example.goalflow.ui.components.DeleteConfirmationDialog
 import com.example.goalflow.ui.home.HomeViewModel
 @Composable
 fun ActivityListScreen(
@@ -51,7 +48,12 @@ fun ActivityListScreen(
 	activityViewModel: ActivityViewModel = hiltViewModel()
 ) {
 	val uiState by activityViewModel.getAll.collectAsState()
-	var showDialog by remember { mutableStateOf(false) }
+
+	var showDeleteDialog by remember { mutableStateOf(false) }
+	var showAddActivityDialog by remember { mutableStateOf(false) }
+	var showEditDialog by remember { mutableStateOf(false) }
+	var selectedActivity by remember { mutableStateOf<ActivityItem?>(null) }
+
 	var activityUIList by remember { mutableStateOf(listOf<ActivityUI>()) }
 
 	// ✅ Update: Observing list based on ViewModel
@@ -86,117 +88,113 @@ fun ActivityListScreen(
 					},
 					actions = {
 						ActionIcon(
-							onClick = { activityViewModel.delete(activityUI.activity) },
+							onClick = {
+								selectedActivity = activityUI.activity
+								showDeleteDialog = true
+							},
 							backgroundColor = Color.Red,
 							icon = Icons.Default.Delete
 						)
 						ActionIcon(
-							onClick = { /* TODO: edit */ },
+							onClick = {
+								selectedActivity = activityUI.activity
+								showEditDialog = true
+							},
 							backgroundColor = Color.Blue,
 							icon = Icons.Default.Edit
 						)
 					}
+
 				) {
-					ActivityItemComposable(activity = activityUI.activity, isGoal = isGoal)
+					ActivityItemComposable(
+						activity = activityUI.activity,
+						isGoal = isGoal,
+						onClick = {
+							// Collapse all swipes
+							activityUIList = activityUIList.map { it.copy(isOptionsRevealed = false) }
+						})
 				}
 			}
 		}
 
 		Button(
-			onClick = { showDialog = true },
+			onClick = { showAddActivityDialog = true },
 			modifier = Modifier.fillMaxWidth()
 		) {
 			Text(if (isGoal) "Add Goal" else "Add Consumable")
 		}
 	}
 
-	if (showDialog) {
-		AddActivityDialog(
-			isGoal = isGoal,
-			onDismiss = { showDialog = false },
+	if (showDeleteDialog && selectedActivity != null) {
+		DeleteConfirmationDialog(
+			dialogTitle =  "Delete Activity",
+			dialogSubTitle = "Are you sure you want to delete \"${selectedActivity!!.name}\"?",
+			onDismissRequest = { showDeleteDialog = false },
+			onConfirmation = {
+				activityViewModel.delete(selectedActivity!!)
+				showDeleteDialog = false
+			}
+		)
+	}
+
+	if (showEditDialog && selectedActivity != null) {
+		ActivityDialog(
+			initialName = selectedActivity!!.name,
+			initialWeight = selectedActivity!!.weight,
+			onDismiss = { showEditDialog = false },
+			onSave = { name, weight ->
+				val updated = when (selectedActivity) {
+					is Goal -> (selectedActivity as Goal).copy(name = name, weight = weight)
+					is Consumable -> (selectedActivity as Consumable).copy(name = name, weight = weight)
+					else -> return@ActivityDialog
+				}
+				activityViewModel.add(updated) // this uses insert(onConflict = REPLACE)
+				showEditDialog = false
+			}
+
+		)
+	}
+
+	if (showAddActivityDialog) {
+		ActivityDialog(
+			onDismiss = { showAddActivityDialog = false },
 			onSave = { name, weight ->
 				activityViewModel.add(
 					if (isGoal)
 						Goal(name = name, weight = weight)
 					else
 						Consumable(name = name, weight = weight))
-				showDialog = false
+				showAddActivityDialog = false
 			}
 		)
 	}
 }
-
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun TimePickerDialog(
-//	onConfirm: (TimePickerState) -> Unit,
-//	onDismiss: () -> Unit,
-//) {
-//	val timePickerState = rememberTimePickerState(
-//		initialHour = 0,
-//		initialMinute = 0,
-//		is24Hour = true,
-//	)
-//
-//	AlertDialog(
-//		onDismissRequest = onDismiss,
-//		dismissButton = {
-//			TextButton(onClick = { onDismiss() }) {
-//				Text("Dismiss")
-//			}
-//		},
-//		confirmButton = {
-//			TextButton(onClick = { onConfirm(timePickerState) }) {
-//				Text("OK")
-//			}
-//		},
-//		text = {
-//			TimePicker(
-//				state = timePickerState,
-//			)
-//		}
-//	)
-//}
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityItemComposable(
 	activity: ActivityItem,
 	isGoal: Boolean,
+	onClick: () -> Unit,
 	homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 	var showDialog by remember { mutableStateOf(false) }
-
 
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(8.dp)
-			.clickable { showDialog = true },
+			.clickable {
+				onClick()
+				showDialog = true
+			},
 		horizontalArrangement = Arrangement.SpaceBetween
 	) {
 		Text(text = activity.name)
 		Text(text = "Weight: ${activity.weight}")
 	}
 
-	// ✅ Shared time picker that uses isGoal to adjust score calculation
 	if (showDialog) {
-//		TimePickerDialog(
-//			onDismiss = { showDialog = false },
-//			onConfirm = {
-//				homeViewModel.updateScore(
-//					((it.hour * 60) + it.minute),
-//					activity.weight,
-//					isGoal = isGoal
-//				)
-//				showDialog = false
-//			}
-//		)
-
-
 		TimePickerDialog(
 			initialHour = 0,
 			initialMinute = 0,
@@ -215,45 +213,45 @@ fun ActivityItemComposable(
 
 
 @Composable
-fun AddActivityDialog(
-	isGoal: Boolean, // <-- ✅ Used to adjust title and labels
+fun ActivityDialog(
 	onDismiss: () -> Unit,
-	onSave: (String, Int) -> Unit
+	onSave: (String, Int) -> Unit,
+	initialName: String = "",
+	initialWeight: Int = 1
 ) {
-	var name by remember { mutableStateOf("") }
-	var weight by remember { mutableStateOf("") }
+	var name by remember { mutableStateOf(initialName) }
+	var weight by remember { mutableStateOf(initialWeight.toString()) }
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
-		title = { Text("Add New ${if (isGoal) "Goal" else "Consumable"}") },
+		title = { Text(if (initialName.isEmpty()) "Add Activity" else "Edit Activity") },
 		text = {
 			Column {
-				TextField(
+				OutlinedTextField(
 					value = name,
 					onValueChange = { name = it },
-					label = { Text("${if (isGoal) "Goal" else "Consumable"} Name") }
+					label = { Text("Name") }
 				)
-				Spacer(modifier = Modifier.height(8.dp))
-				TextField(
+				OutlinedTextField(
 					value = weight,
 					onValueChange = { weight = it },
-					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-					label = { Text("Weight") }
+					label = { Text("Weight") },
+					keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
 				)
 			}
 		},
 		confirmButton = {
-			Button(onClick = {
-				val weightInt = weight.toIntOrNull() ?: 0
-				if (name.isNotBlank() && weightInt > 0) {
-					onSave(name, weightInt) // ✅ Handles both cases
-				}
+			TextButton(onClick = {
+				onSave(name, weight.toIntOrNull() ?: 1)
 			}) {
 				Text("Save")
 			}
 		},
 		dismissButton = {
-			Button(onClick = onDismiss) { Text("Cancel") }
+			TextButton(onClick = onDismiss) {
+				Text("Cancel")
+			}
 		}
 	)
 }
+

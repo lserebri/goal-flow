@@ -9,5 +9,7 @@ open class ActivityRepository<T : ActivityItem>(
 
 	open suspend fun insert(activity: T) = dao.insert(activity)
 
+	open suspend fun update(activity: T) = dao.update(activity)
+
 	open suspend fun delete(activity: T) = dao.delete(activity)
 }

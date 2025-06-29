@@ -43,6 +43,18 @@ class ActivityViewModel @Inject constructor (
 
 	}
 
+	fun update(activityItem: ActivityItem) {
+		viewModelScope.launch {
+			if (activityItem is Goal && isFirstTab) {
+				goalRepository.update(activityItem)
+			} else if (activityItem is Consumable && !isFirstTab) {
+				consumableRepository.update(activityItem)
+			} else {
+				throw IllegalArgumentException("Invalid type for the current repository")
+			}
+		}
+	}
+
 	fun delete(activityItem: ActivityItem) {
 		viewModelScope.launch {
 			if (activityItem is Goal && isFirstTab) {
