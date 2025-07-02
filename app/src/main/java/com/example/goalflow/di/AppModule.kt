@@ -5,9 +5,9 @@ import androidx.room.Room
 import com.example.goalflow.data.goal.GoalDao
 import com.example.goalflow.data.GoalFlowDatabase
 import com.example.goalflow.data.activity.ActivityRepository
-import com.example.goalflow.data.consumable.Consumable
-import com.example.goalflow.data.consumable.ConsumableDao
-import com.example.goalflow.data.consumable.ConsumableRepository
+import com.example.goalflow.data.distraction.Distraction
+import com.example.goalflow.data.distraction.DistractionDao
+import com.example.goalflow.data.distraction.DistractionRepository
 import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.data.goal.GoalRepository
 import com.example.goalflow.data.score.RealScoreRepository
@@ -40,7 +40,7 @@ object AppModule {
 
 
     @Provides
-    fun provideConsumableDao(db: GoalFlowDatabase): ConsumableDao = db.consumableDao()
+    fun provideDistractionDao(db: GoalFlowDatabase): DistractionDao = db.distractionDao()
 
     @Provides
     @Singleton
@@ -52,9 +52,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    @Named("consumableActivity")
-    fun provideConsumableRepository(dao: ConsumableDao): ActivityRepository<Consumable> {
-        return ConsumableRepository(dao)
+    @Named("distractionActivity")
+    fun provideDistractionRepository(dao: DistractionDao): ActivityRepository<Distraction> {
+        return DistractionRepository(dao)
     }
 
     @Provides

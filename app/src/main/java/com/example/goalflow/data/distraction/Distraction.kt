@@ -1,11 +1,11 @@
-package com.example.goalflow.data.consumable
+package com.example.goalflow.data.distraction
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.goalflow.data.activity.ActivityItem
 
-@Entity(tableName = "consumable")
-data class Consumable(
+@Entity(tableName = "distraction")
+data class Distraction(
     @PrimaryKey(autoGenerate = true)
     override val id: Int = 0,
 

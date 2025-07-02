@@ -38,7 +38,7 @@ data class Destination(
 
 val destinations = listOf(
     Destination("Goals", "goals"),
-    Destination("Consumables", "consumables")
+    Destination("Distractions", "distractions")
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +59,7 @@ fun NavigationTab(modifier: Modifier = Modifier) {
                         val route = if (destination.route == "goals") {
                             "goals?isFirstTab=true"
                         } else {
-                            "consumables?isFirstTab=false"
+                            "distractions?isFirstTab=false"
                         }
                         navController.navigate(route) {
                             // Avoid building up a back stack of tabs
@@ -98,7 +98,7 @@ fun NavigationTab(modifier: Modifier = Modifier) {
             }
 
             composable(
-                "consumables?isFirstTab={isFirstTab}",
+                "distractions?isFirstTab={isFirstTab}",
                 arguments = listOf(navArgument("isFirstTab") {
                     type = NavType.BoolType
                     defaultValue = false

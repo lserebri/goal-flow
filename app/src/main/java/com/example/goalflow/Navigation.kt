@@ -27,7 +27,7 @@
 //val topLevelRoutes = listOf(
 //    TopLevelRoute("Goals", "goals", Icons.Default.List),
 //    TopLevelRoute("Home", "home", Icons.Default.Home),
-//    TopLevelRoute("Consumables", "consumables", Icons.Default.ShoppingCart)
+//    TopLevelRoute("Distractions", "distractions", Icons.Default.ShoppingCart)
 //)
 //
 //@Composable
@@ -65,7 +65,7 @@
 //        ) {
 //            composable("home") { HomeScreen() }
 //            composable("goals") { GoalListScreen() }
-//            composable("consumables") { ConsumableListScreen() }
+//            composable("distractions") { DistractionListScreen() }
 //        }
 //    }
 //}

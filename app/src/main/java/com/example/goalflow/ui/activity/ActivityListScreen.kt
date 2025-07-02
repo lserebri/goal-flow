@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import com.example.goalflow.data.activity.ActivityItem
-import com.example.goalflow.data.consumable.Consumable
+import com.example.goalflow.data.distraction.Distraction
 import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.ui.action.ActionIcon
 import com.example.goalflow.ui.action.SwappableItemWithAction
@@ -112,7 +112,7 @@ fun ActivityListScreen(
 			onClick = { showAddActivityDialog = true },
 			modifier = Modifier.fillMaxWidth()
 		) {
-			Text(if (isGoal) "Add Goal" else "Add Consumable")
+			Text(if (isGoal) "Add Goal" else "Add Distraction")
 		}
 	}
 
@@ -136,7 +136,7 @@ fun ActivityListScreen(
 			onSave = { name, weight ->
 				val updated = when (selectedActivity) {
 					is Goal -> (selectedActivity as Goal).copy(name = name, weight = weight)
-					is Consumable -> (selectedActivity as Consumable).copy(name = name, weight = weight)
+					is Distraction -> (selectedActivity as Distraction).copy(name = name, weight = weight)
 					else -> return@ActivityDialog
 				}
 				activityViewModel.add(updated) // this uses insert(onConflict = REPLACE)
@@ -154,7 +154,7 @@ fun ActivityListScreen(
 					if (isGoal)
 						Goal(name = name, weight = weight)
 					else
-						Consumable(name = name, weight = weight))
+						Distraction(name = name, weight = weight))
 				showAddActivityDialog = false
 			}
 		)
