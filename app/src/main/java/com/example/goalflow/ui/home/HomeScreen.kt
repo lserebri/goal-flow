@@ -62,7 +62,6 @@ fun NavigationTab(modifier: Modifier = Modifier) {
                             "distractions?isFirstTab=false"
                         }
                         navController.navigate(route) {
-                            // Avoid building up a back stack of tabs
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
@@ -121,13 +120,12 @@ fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
             Column(modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize()
-                .padding(25.dp)
+                .padding(10.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 20.dp)
-                        .weight(0.2f), // Top section for score
+                        .weight(1f), // Top section for score
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -139,7 +137,7 @@ fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
 
 //                Spacer(modifier = Modifier.size(100.dp))
 
-                NavigationTab(modifier = Modifier.weight(0.3f))
+                NavigationTab(modifier = Modifier.weight(2f))
             }
         }
     }
