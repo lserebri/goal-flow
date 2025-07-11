@@ -166,6 +166,8 @@ fun ActivityListComposable(
 	onActivityClick: (ActivityItem) -> Unit,
 	onAddActivityButtonClick: () -> Unit,
 ) {
+	var cardHeight by remember { mutableStateOf(100.dp) }
+
 	Column(
 	) {
 		BoxWithConstraints(
@@ -174,7 +176,7 @@ fun ActivityListComposable(
 				.weight(6f)
 		) {
 			val boxScope = this
-			val cardHeight = (boxScope.maxHeight / 5) - 2.dp
+			cardHeight = (boxScope.maxHeight / 5) - 2.dp
 			LazyColumn(
 				modifier = Modifier.padding(top = 2.dp),
 				verticalArrangement = Arrangement.SpaceEvenly,
@@ -191,21 +193,22 @@ fun ActivityListComposable(
 					Spacer(modifier = Modifier.size(2.dp))
 				}
 			}
-			Card(
+		}
+		Spacer(modifier = Modifier.size(2.dp))
+		Card(
+			modifier = Modifier
+				.height(cardHeight)
+				.align(Alignment.CenterHorizontally)
+		) {
+			FloatingActionButton(
+				shape = RectangleShape,
+				onClick = onAddActivityButtonClick,
 				modifier = Modifier
-					.height(cardHeight)
-					.align(Alignment.BottomCenter)
+					.align(Alignment.CenterHorizontally)
+					.weight(1f)
+					.fillMaxWidth()
 			) {
-				FloatingActionButton(
-					shape = RectangleShape,
-					onClick = onAddActivityButtonClick,
-					modifier = Modifier
-						.align(Alignment.CenterHorizontally)
-						.weight(1f)
-						.fillMaxWidth()
-				) {
-					Icon(Icons.Filled.Add, "Floating action button.")
-				}
+				Icon(Icons.Filled.Add, "Floating action button.")
 			}
 		}
 	}
