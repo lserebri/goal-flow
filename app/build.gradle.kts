@@ -61,9 +61,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.55")
+    implementation("com.google.dagger:hilt-android:2.57")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    ksp("com.google.dagger:hilt-android-compiler:2.55")
+    ksp("com.google.dagger:hilt-android-compiler:2.57")
 
     // Fragment
     implementation ("androidx.navigation:navigation-fragment-ktx:2.9.0")
@@ -74,9 +74,13 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+
+
+
+    implementation ("androidx.compose.material:material-icons-extended")
+
 }

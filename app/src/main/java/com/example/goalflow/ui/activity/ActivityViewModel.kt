@@ -8,33 +8,39 @@ import com.example.goalflow.data.activity.ActivityRepository
 import com.example.goalflow.data.distraction.Distraction
 import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.ui.activity.ActivityUIState.*
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 
-@HiltViewModel
-class ActivityViewModel @Inject constructor (
+@HiltViewModel(assistedFactory = ActivityViewModel.ActivityViewModelFactory::class)
+class ActivityViewModel @AssistedInject constructor (
 	@Named("goalActivity") private val goalRepository: ActivityRepository<Goal>,
 	@Named("distractionActivity") private val distractionRepository: ActivityRepository<Distraction>,
-	savedStateHandle: SavedStateHandle
-) : ViewModel() {
-	private val isFirstTab: Boolean = savedStateHandle["isFirstTab"] ?: true
+	@Assisted private val isGoal: Boolean) : ViewModel() {
 
-	private val activeRepo = if (isFirstTab) goalRepository else distractionRepository
+	@AssistedFactory
+	interface ActivityViewModelFactory {
+		fun create(isGoal: Boolean): ActivityViewModel
+	}
+
+	private fun getActiveRepo() = if (isGoal) goalRepository else distractionRepository
 
 
-	val getAll: StateFlow<ActivityUIState> = activeRepo
+	val getAll: StateFlow<ActivityUIState> = getActiveRepo()
 		.getAll.map<List<ActivityItem>, ActivityUIState>(::Success)
 		.catch { emit(Error(it)) }
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
 
 	fun add(activityItem: ActivityItem) {
 		viewModelScope.launch {
-			if (activityItem is Goal && isFirstTab) {
+			if (activityItem is Goal && isGoal) {
 				goalRepository.insert(activityItem)
-			} else if (activityItem is Distraction && !isFirstTab) {
+			} else if (activityItem is Distraction && !isGoal) {
 				distractionRepository.insert(activityItem)
 			} else {
 				throw IllegalArgumentException("Invalid type for the current repository")
@@ -45,9 +51,9 @@ class ActivityViewModel @Inject constructor (
 
 	fun update(activityItem: ActivityItem) {
 		viewModelScope.launch {
-			if (activityItem is Goal && isFirstTab) {
+			if (activityItem is Goal && isGoal) {
 				goalRepository.update(activityItem)
-			} else if (activityItem is Distraction && !isFirstTab) {
+			} else if (activityItem is Distraction && !isGoal) {
 				distractionRepository.update(activityItem)
 			} else {
 				throw IllegalArgumentException("Invalid type for the current repository")
@@ -57,9 +63,9 @@ class ActivityViewModel @Inject constructor (
 
 	fun delete(activityItem: ActivityItem) {
 		viewModelScope.launch {
-			if (activityItem is Goal && isFirstTab) {
+			if (activityItem is Goal && isGoal) {
 				goalRepository.delete(activityItem)
-			} else if (activityItem is Distraction && !isFirstTab) {
+			} else if (activityItem is Distraction && !isGoal) {
 				distractionRepository.delete(activityItem)
 			} else {
 				throw IllegalArgumentException("Invalid type for the current repository")

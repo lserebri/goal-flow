@@ -2,17 +2,24 @@ package com.example.goalflow.ui.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.outlined.RocketLaunch
+import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,90 +28,84 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavType
-import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.goalflow.ui.activity.ActivityListScreen
+import com.example.goalflow.ui.activity.ActivityListScreenWithFactory
 
-data class Destination(
-    val name: String,
+data class TabItem (
+    val title: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
     val route: String
 )
 
-val destinations = listOf(
-    Destination("Goals", "goals"),
-    Destination("Distractions", "distractions")
+val tabItems = listOf(
+    TabItem(
+        title = "Goals",
+        selectedIcon = Icons.Filled.RocketLaunch,
+        unselectedIcon = Icons.Outlined.RocketLaunch,
+        route = "goals?isFirstTab=true"
+    ),
+    TabItem(
+        title = "Distractions",
+        selectedIcon = Icons.Filled.SportsEsports,
+        unselectedIcon = Icons.Outlined.SportsEsports,
+        route = "distractions?isFirstTab=false"
+    )
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationTab(modifier: Modifier = Modifier) {
-    val navController = rememberNavController()
-    val startDestination = Destination("Goals", "goals")
+    val startTabIndex = 0
     var selectedDestination by rememberSaveable {
-        mutableIntStateOf(destinations.indexOf(startDestination))
+        mutableIntStateOf(startTabIndex)
+    }
+
+    val pagerState = rememberPagerState {
+        tabItems.size
+    }
+    LaunchedEffect(selectedDestination) {
+        pagerState.animateScrollToPage(selectedDestination)
+    }
+    LaunchedEffect(pagerState.currentPage) {
+        selectedDestination = pagerState.currentPage
     }
 
     Column(modifier = modifier) {
-        SecondaryTabRow(selectedTabIndex = selectedDestination) {
-            destinations.forEachIndexed { index, destination ->
+        TabRow(selectedTabIndex = selectedDestination) {
+            tabItems.forEachIndexed { index, tabItem ->
                 Tab(
                     selected = selectedDestination == index,
                     onClick = {
-                        val route = if (destination.route == "goals") {
-                            "goals?isFirstTab=true"
-                        } else {
-                            "distractions?isFirstTab=false"
-                        }
-                        navController.navigate(route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
                         selectedDestination = index
                     },
                     text = {
                         Text(
-                            text = destination.name,
+                            text = tabItem.title,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = if (selectedDestination == index) {
+                                tabItem.selectedIcon
+                            } else
+                                tabItem.unselectedIcon,
+                            contentDescription = tabItem.title
                         )
                     }
                 )
             }
         }
 
-        NavHost(
-            navController = navController,
-            startDestination = "goals",
-            modifier = Modifier.weight(1f)
-        ) {
-            composable(
-                "goals?isFirstTab={isFirstTab}",
-                arguments = listOf(navArgument("isFirstTab") {
-                    type = NavType.BoolType
-                    defaultValue = true
-                })
-            ) {
-                ActivityListScreen(isGoal = true)
-            }
-
-            composable(
-                "distractions?isFirstTab={isFirstTab}",
-                arguments = listOf(navArgument("isFirstTab") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                })
-            ) {
-                ActivityListScreen(isGoal = false)
-            }
+        HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
+            val isGoal = (page == 0)
+            ActivityListScreenWithFactory(isGoal = isGoal)
         }
     }
 }
@@ -125,7 +126,7 @@ fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .weight(1f), // Top section for score
+                        .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -134,8 +135,6 @@ fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
                         fontSize = 60.sp
                     )
                 }
-
-//                Spacer(modifier = Modifier.size(100.dp))
 
                 NavigationTab(modifier = Modifier.weight(2f))
             }

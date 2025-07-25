@@ -57,7 +57,7 @@ import com.example.goalflow.ui.home.HomeViewModel
 @Composable
 fun ActivityListScreen(
 	isGoal: Boolean,
-	activityViewModel: ActivityViewModel = hiltViewModel(),
+	activityViewModel: ActivityViewModel,
 	homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 	val uiState by activityViewModel.getAll.collectAsState()
@@ -143,8 +143,8 @@ fun ActivityListScreen(
 
 	if (showTimePickerDialog) {
 		TimePickerDialog(
-			initialHour = 0,
-			initialMinute = 0,
+			initialHour = -1,
+			initialMinute = -1,
 			onDismiss = { showTimePickerDialog = false },
 			onConfirm = { hour, minute ->
 				homeViewModel.updateScore(
@@ -176,7 +176,7 @@ fun ActivityListComposable(
 				.weight(6f)
 		) {
 			val boxScope = this
-			cardHeight = (boxScope.maxHeight / 5) - 2.dp
+			cardHeight = (boxScope.maxHeight / 4) - 2.dp
 			LazyColumn(
 				modifier = Modifier.padding(top = 2.dp),
 				verticalArrangement = Arrangement.SpaceEvenly,

@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -110,13 +111,17 @@ fun TimePickerDialog(
 		onSelectionChanged = { selectedMinute.intValue = it }
 	)
 
-	Dialog(onDismissRequest = onDismiss) {
-		Surface(
+	Dialog(
+		onDismissRequest = onDismiss
+	) {
+		Card(
 			modifier = Modifier
 				.width(280.dp)
 				.wrapContentHeight(),
-			tonalElevation = 6.dp
-		) {
+			shape = RoundedCornerShape(30.dp)
+
+
+			) {
 			Column(
 				modifier = Modifier
 					.fillMaxWidth(),
@@ -255,4 +260,15 @@ private fun TimeColumn(
 				.border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
 		)
 	}
+}
+
+
+@Composable
+fun TimePeackerPreview() {
+	TimePickerDialog(
+		initialHour = 0,
+		initialMinute = 0,
+		onDismiss = {  },
+		onConfirm = { _, _ ->  }
+	)
 }
