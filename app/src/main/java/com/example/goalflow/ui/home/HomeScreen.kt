@@ -49,8 +49,7 @@ val tabItems = listOf(
 		selectedIcon = Icons.Filled.RocketLaunch,
 		unselectedIcon = Icons.Outlined.RocketLaunch,
 		route = "goals?isFirstTab=true"
-	),
-	TabItem(
+	), TabItem(
 		title = "Distractions",
 		selectedIcon = Icons.Filled.SportsEsports,
 		unselectedIcon = Icons.Outlined.SportsEsports,
@@ -79,28 +78,19 @@ fun NavigationTab(modifier: Modifier = Modifier) {
 	Column(modifier = modifier) {
 		TabRow(selectedTabIndex = selectedDestination) {
 			tabItems.forEachIndexed { index, tabItem ->
-				Tab(
-					selected = selectedDestination == index,
-					onClick = {
-						selectedDestination = index
-					},
-					text = {
-						Text(
-							text = tabItem.title,
-							maxLines = 2,
-							overflow = TextOverflow.Ellipsis
-						)
-					},
-					icon = {
-						Icon(
-							imageVector = if (selectedDestination == index) {
-								tabItem.selectedIcon
-							} else
-								tabItem.unselectedIcon,
-							contentDescription = tabItem.title
-						)
-					}
-				)
+				Tab(selected = selectedDestination == index, onClick = {
+					selectedDestination = index
+				}, text = {
+					Text(
+						text = tabItem.title, maxLines = 2, overflow = TextOverflow.Ellipsis
+					)
+				}, icon = {
+					Icon(
+						imageVector = if (selectedDestination == index) {
+							tabItem.selectedIcon
+						} else tabItem.unselectedIcon, contentDescription = tabItem.title
+					)
+				})
 			}
 		}
 
