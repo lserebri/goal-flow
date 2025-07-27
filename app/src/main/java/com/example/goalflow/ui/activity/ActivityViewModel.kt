@@ -21,15 +21,60 @@ import javax.inject.Named
 class ActivityViewModel @AssistedInject constructor (
 	@Named("goalActivity") private val goalRepository: ActivityRepository<Goal>,
 	@Named("distractionActivity") private val distractionRepository: ActivityRepository<Distraction>,
-	@Assisted private val isGoal: Boolean) : ViewModel() {
+	@Assisted private val isGoal: Boolean
+) : ViewModel() {
+
+	private fun getActiveRepo() = if (isGoal) goalRepository else distractionRepository
+
+	private val _showDeleteDialog = MutableStateFlow(false)
+	val showDeleteDialog: StateFlow<Boolean> = _showDeleteDialog
+
+	private val _showAddActivityDialog = MutableStateFlow(false)
+	val showAddActivityDialog: StateFlow<Boolean> = _showAddActivityDialog
+
+	private val _showEditDialog = MutableStateFlow(false)
+	val showEditDialog: StateFlow<Boolean> = _showEditDialog
+
+
+	private val _showTimePickerDialog = MutableStateFlow(false)
+	val showTimePickerDialog: StateFlow<Boolean> = _showTimePickerDialog
+
+	private val _selectedActivity = MutableStateFlow<ActivityItem?>(null)
+	val selectedActivity: StateFlow<ActivityItem?> = _selectedActivity
+
+	private val _activities = MutableStateFlow<List<ActivityUI>>(emptyList())
+	val activities: StateFlow<List<ActivityUI>> = _activities
+
+
+	fun loadActivities() {
+		viewModelScope.launch {
+			getActiveRepo().getAll
+				.map { list ->
+					list.map { ActivityUI(it) }
+						.sortedByDescending { it.activity.weight }
+				}
+				.catch { _activities.value = emptyList() }
+				.collect { sortedList ->
+					_activities.value = sortedList
+				}
+		}
+	}
+
+	fun onAddActivityClick() { _showAddActivityDialog.value = true }
+	fun onAddActivityDismiss() { _showAddActivityDialog.value = false }
+	fun onSelectActivity(activity: ActivityItem?) { _selectedActivity.value = activity }
+	fun onDeleteDialogShow() { _showDeleteDialog.value = true }
+	fun onDeleteDialogDismiss() { _showDeleteDialog.value = false }
+	fun onEditDialogShow() { _showEditDialog.value = true }
+	fun onEditDialogDismiss() { _showEditDialog.value = false }
+	fun onTimePickerShow() { _showTimePickerDialog.value = true }
+	fun onTimePickerDismiss() { _showTimePickerDialog.value = false }
+
 
 	@AssistedFactory
 	interface ActivityViewModelFactory {
 		fun create(isGoal: Boolean): ActivityViewModel
 	}
-
-	private fun getActiveRepo() = if (isGoal) goalRepository else distractionRepository
-
 
 	val getAll: StateFlow<ActivityUIState> = getActiveRepo()
 		.getAll.map<List<ActivityItem>, ActivityUIState>(::Success)

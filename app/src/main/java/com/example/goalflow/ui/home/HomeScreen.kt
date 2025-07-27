@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.outlined.RocketLaunch
 import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,114 +34,114 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.example.goalflow.ui.activity.ActivityListScreenWithFactory
 
-data class TabItem (
-    val title: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
-    val route: String
+data class TabItem(
+	val title: String,
+	val selectedIcon: ImageVector,
+	val unselectedIcon: ImageVector,
+	val route: String
 )
 
 val tabItems = listOf(
-    TabItem(
-        title = "Goals",
-        selectedIcon = Icons.Filled.RocketLaunch,
-        unselectedIcon = Icons.Outlined.RocketLaunch,
-        route = "goals?isFirstTab=true"
-    ),
-    TabItem(
-        title = "Distractions",
-        selectedIcon = Icons.Filled.SportsEsports,
-        unselectedIcon = Icons.Outlined.SportsEsports,
-        route = "distractions?isFirstTab=false"
-    )
+	TabItem(
+		title = "Goals",
+		selectedIcon = Icons.Filled.RocketLaunch,
+		unselectedIcon = Icons.Outlined.RocketLaunch,
+		route = "goals?isFirstTab=true"
+	),
+	TabItem(
+		title = "Distractions",
+		selectedIcon = Icons.Filled.SportsEsports,
+		unselectedIcon = Icons.Outlined.SportsEsports,
+		route = "distractions?isFirstTab=false"
+	)
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationTab(modifier: Modifier = Modifier) {
-    val startTabIndex = 0
-    var selectedDestination by rememberSaveable {
-        mutableIntStateOf(startTabIndex)
-    }
+	val startTabIndex = 0
+	var selectedDestination by rememberSaveable {
+		mutableIntStateOf(startTabIndex)
+	}
 
-    val pagerState = rememberPagerState {
-        tabItems.size
-    }
-    LaunchedEffect(selectedDestination) {
-        pagerState.animateScrollToPage(selectedDestination)
-    }
-    LaunchedEffect(pagerState.currentPage) {
-        selectedDestination = pagerState.currentPage
-    }
+	val pagerState = rememberPagerState {
+		tabItems.size
+	}
+	LaunchedEffect(selectedDestination) {
+		pagerState.animateScrollToPage(selectedDestination)
+	}
+	LaunchedEffect(pagerState.currentPage) {
+		selectedDestination = pagerState.currentPage
+	}
 
-    Column(modifier = modifier) {
-        TabRow(selectedTabIndex = selectedDestination) {
-            tabItems.forEachIndexed { index, tabItem ->
-                Tab(
-                    selected = selectedDestination == index,
-                    onClick = {
-                        selectedDestination = index
-                    },
-                    text = {
-                        Text(
-                            text = tabItem.title,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = if (selectedDestination == index) {
-                                tabItem.selectedIcon
-                            } else
-                                tabItem.unselectedIcon,
-                            contentDescription = tabItem.title
-                        )
-                    }
-                )
-            }
-        }
+	Column(modifier = modifier) {
+		TabRow(selectedTabIndex = selectedDestination) {
+			tabItems.forEachIndexed { index, tabItem ->
+				Tab(
+					selected = selectedDestination == index,
+					onClick = {
+						selectedDestination = index
+					},
+					text = {
+						Text(
+							text = tabItem.title,
+							maxLines = 2,
+							overflow = TextOverflow.Ellipsis
+						)
+					},
+					icon = {
+						Icon(
+							imageVector = if (selectedDestination == index) {
+								tabItem.selectedIcon
+							} else
+								tabItem.unselectedIcon,
+							contentDescription = tabItem.title
+						)
+					}
+				)
+			}
+		}
 
-        HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
-            val isGoal = (page == 0)
-            ActivityListScreenWithFactory(isGoal = isGoal)
-        }
-    }
+		HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
+			val isGoal = (page == 0)
+			ActivityListScreenWithFactory(isGoal = isGoal)
+		}
+	}
 }
 
 @Composable
 fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
-    val uiState by homeViewModel.score.collectAsState()
+	val uiState by homeViewModel.score.collectAsState()
 
-    if (uiState is ScoreUiState.Success) {
-        val score = (uiState as ScoreUiState.Success).data
+	if (uiState is ScoreUiState.Success) {
+		val score = (uiState as ScoreUiState.Success).data
 
-        Scaffold { contentPadding ->
-            Column(modifier = Modifier
-                .padding(contentPadding)
-                .fillMaxSize()
-                .padding(10.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = score.toString(),
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontSize = 60.sp
-                    )
-                }
+		Scaffold { contentPadding ->
+			Column(
+				modifier = Modifier
+					.padding(contentPadding)
+					.fillMaxSize()
+					.padding(10.dp)
+			) {
+				Box(
+					modifier = Modifier
+						.fillMaxSize()
+						.weight(1f),
+					contentAlignment = Alignment.Center
+				) {
+					Text(
+						text = score.toString(),
+						style = MaterialTheme.typography.headlineLarge,
+						fontSize = 60.sp
+					)
+				}
 
-                NavigationTab(modifier = Modifier.weight(2f))
-            }
-        }
-    }
+				NavigationTab(modifier = Modifier.weight(2f))
+			}
+		}
+	}
 }
 
 

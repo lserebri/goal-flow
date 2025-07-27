@@ -1,39 +1,32 @@
 package com.example.goalflow.ui.activity
 
 import TimePickerDialog
-import android.annotation.SuppressLint
-import android.graphics.drawable.GradientDrawable
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,107 +48,148 @@ import com.example.goalflow.ui.components.DeleteConfirmationDialog
 import com.example.goalflow.ui.home.HomeViewModel
 
 @Composable
+private fun DeleteActivityDialog(
+	show: Boolean,
+	selectedActivity: ActivityItem?,
+	onDismiss: () -> Unit,
+	onConfirm: (ActivityItem) -> Unit
+) {
+	if (show && selectedActivity != null) {
+		DeleteConfirmationDialog(
+			dialogTitle = "Delete Activity",
+			dialogSubTitle = "Are you sure you want to delete \"${selectedActivity.name}\"?",
+			onDismissRequest = onDismiss,
+			onConfirmation = { onConfirm(selectedActivity) })
+	}
+}
+
+@Composable
+private fun EditActivityDialog(
+	show: Boolean,
+	selectedActivity: ActivityItem?,
+	onDismiss: () -> Unit,
+	onSave: (String, Int) -> Unit
+) {
+	if (show && selectedActivity != null) {
+		ActivityDialog(
+			initialName = selectedActivity.name,
+			initialWeight = selectedActivity.weight,
+			onDismiss = onDismiss,
+			onSave = onSave
+		)
+	}
+}
+
+@Composable
+private fun AddActivityDialog(
+	show: Boolean, isGoal: Boolean, onDismiss: () -> Unit, onSave: (String, Int) -> Unit
+) {
+	if (show) {
+		ActivityDialog(
+			onDismiss = onDismiss, onSave = { name, weight ->
+				onSave(name, weight)
+			})
+	}
+}
+
+@Composable
+private fun ActivityTimePickerDialog(
+	show: Boolean, onDismiss: () -> Unit, onConfirm: (Int, Int) -> Unit
+) {
+	if (show) {
+		TimePickerDialog(
+			initialHour = -1, initialMinute = -1, onDismiss = onDismiss, onConfirm = onConfirm
+		)
+	}
+}
+
+@Composable
 fun ActivityListScreen(
 	isGoal: Boolean,
 	activityViewModel: ActivityViewModel,
 	homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-	val uiState by activityViewModel.getAll.collectAsState()
-
-	var showDeleteDialog by remember { mutableStateOf(false) }
-	var showAddActivityDialog by remember { mutableStateOf(false) }
-	var showEditDialog by remember { mutableStateOf(false) }
-	var selectedActivity by remember { mutableStateOf<ActivityItem?>(null) }
-	var showTimePickerDialog by remember { mutableStateOf(false) }
-
-
-	var activityUIList by remember { mutableStateOf(listOf<ActivityUI>()) }
-
-	if (uiState is ActivityUIState.Success) {
-		val activities = (uiState as ActivityUIState.Success).data
-		activityUIList = remember(activities) {
-			activities.map { ActivityUI(it) }.sortedByDescending { it.activity.weight }
-		}
+	// Call loadActivities() once when the screen is first composed
+	LaunchedEffect(Unit) {
+		activityViewModel.loadActivities()
 	}
+
+	val activityUIList by activityViewModel.activities.collectAsState()
 
 	ActivityListComposable(
 		activityUIList,
 		onAddActivityButtonClick = {
-			showAddActivityDialog = true
+			activityViewModel.onAddActivityClick()
 		},
 		onEditClick = {
-			selectedActivity = it
-			showEditDialog = true
+			activityViewModel.onSelectActivity(it)
+			activityViewModel.onEditDialogShow()
 		},
 		onDeleteClick = {
-			selectedActivity = it
-			showDeleteDialog = true
+			activityViewModel.onSelectActivity(it)
+			activityViewModel.onDeleteDialogShow()
 		},
 		onActivityClick = {
-			selectedActivity = it
-			showTimePickerDialog = true
+			activityViewModel.onSelectActivity(it)
+			activityViewModel.onTimePickerShow()
 		},
 	)
 
-	if (showDeleteDialog && selectedActivity != null) {
-		DeleteConfirmationDialog(
-			dialogTitle =  "Delete Activity",
-			dialogSubTitle = "Are you sure you want to delete \"${selectedActivity!!.name}\"?",
-			onDismissRequest = { showDeleteDialog = false },
-			onConfirmation = {
-				activityViewModel.delete(selectedActivity!!)
-				showDeleteDialog = false
-			}
-		)
-	}
+	val showDeleteDialog by activityViewModel.showDeleteDialog.collectAsState()
+	val showAddActivityDialog by activityViewModel.showAddActivityDialog.collectAsState()
+	val selectedActivity by activityViewModel.selectedActivity.collectAsState()
+	val showEditDialog by activityViewModel.showEditDialog.collectAsState()
+	val showTimePickerDialog by activityViewModel.showTimePickerDialog.collectAsState()
 
-	if (showEditDialog && selectedActivity != null) {
-		ActivityDialog(
-			initialName = selectedActivity!!.name,
-			initialWeight = selectedActivity!!.weight,
-			onDismiss = { showEditDialog = false },
-			onSave = { name, weight ->
-				val updated = when (selectedActivity) {
-					is Goal -> (selectedActivity as Goal).copy(name = name, weight = weight)
-					is Distraction -> (selectedActivity as Distraction).copy(name = name, weight = weight)
-					else -> return@ActivityDialog
-				}
-				activityViewModel.add(updated) // this uses insert(onConflict = REPLACE)
-				showEditDialog = false
-			}
+	DeleteActivityDialog(
+		show = showDeleteDialog,
+		selectedActivity = selectedActivity,
+		onDismiss = { activityViewModel.onDeleteDialogDismiss() },
+		onConfirm = {
+			activityViewModel.delete(it)
+			activityViewModel.onDeleteDialogDismiss()
+		})
 
-		)
-	}
-
-	if (showAddActivityDialog) {
-		ActivityDialog(
-			onDismiss = { showAddActivityDialog = false },
-			onSave = { name, weight ->
-				activityViewModel.add(
-					if (isGoal)
-						Goal(name = name, weight = weight)
-					else
-						Distraction(name = name, weight = weight))
-				showAddActivityDialog = false
-			}
-		)
-	}
-
-	if (showTimePickerDialog) {
-		TimePickerDialog(
-			initialHour = -1,
-			initialMinute = -1,
-			onDismiss = { showTimePickerDialog = false },
-			onConfirm = { hour, minute ->
-				homeViewModel.updateScore(
-					(hour * 60 + minute),
-					selectedActivity!!.weight,
-					isGoal = isGoal
+	EditActivityDialog(
+		show = showEditDialog,
+		selectedActivity = selectedActivity,
+		onDismiss = { activityViewModel.onEditDialogDismiss() },
+		onSave = { name, weight ->
+			val updated = when (selectedActivity) {
+				is Goal -> (selectedActivity as Goal).copy(name = name, weight = weight)
+				is Distraction -> (selectedActivity as Distraction).copy(
+					name = name, weight = weight
 				)
-				showTimePickerDialog = false
-			},
-		)
-	}
+
+				else -> return@EditActivityDialog
+			}
+			activityViewModel.update(updated)
+			activityViewModel.onEditDialogDismiss()
+		})
+
+	AddActivityDialog(
+		show = showAddActivityDialog,
+		isGoal = isGoal,
+		onDismiss = { activityViewModel.onAddActivityDismiss() },
+		onSave = { name, weight ->
+			activityViewModel.add(
+				if (isGoal) Goal(name = name, weight = weight)
+				else Distraction(name = name, weight = weight)
+			)
+			activityViewModel.onAddActivityDismiss()
+		})
+
+	ActivityTimePickerDialog(
+		show = showTimePickerDialog,
+		onDismiss = { activityViewModel.onTimePickerDismiss() },
+		onConfirm = { hour, minute ->
+			selectedActivity?.let {
+				homeViewModel.updateScore(
+					(hour * 60 + minute), it.weight, isGoal = isGoal
+				)
+			}
+			activityViewModel.onTimePickerDismiss()
+		})
 }
 
 @Composable
@@ -213,6 +247,7 @@ fun ActivityListComposable(
 		}
 	}
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityComposable(
@@ -232,8 +267,7 @@ fun ActivityComposable(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Box(
-				modifier = Modifier
-					.weight(1f),
+				modifier = Modifier.weight(1f),
 				contentAlignment = Alignment.Center,
 			) {
 				Text(
@@ -267,9 +301,7 @@ fun ActivityComposable(
 }
 
 @Preview(
-	showBackground = true,
-	device = Devices.PIXEL_7_PRO,
-	showSystemUi = true
+	showBackground = true, device = Devices.PIXEL_7_PRO, showSystemUi = true
 )
 @Composable
 fun ActivityListPreview() {
@@ -307,11 +339,8 @@ fun ActivityListPreview() {
 @Composable
 fun ActivityItemPreview() {
 	ActivityComposable(
-		activity = Goal(id = 1, name = "Activity 1", weight = 10),
-		onEditClick = {},
+		activity = Goal(id = 1, name = "Activity 1", weight = 10), onEditClick = {},
 
-		onDeleteClick = {},
-		onActivityClick = {},
-		modifier = Modifier
+		onDeleteClick = {}, onActivityClick = {}, modifier = Modifier
 	)
 }
