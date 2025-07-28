@@ -9,17 +9,11 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.RocketLaunch
-import androidx.compose.material.icons.filled.SportsEsports
-import androidx.compose.material.icons.outlined.RocketLaunch
-import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,77 +25,43 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.goalflow.data.distraction.Distraction
 import com.example.goalflow.data.goal.Goal
-import com.example.goalflow.ui.activity.ActivityListScreenWithFactory
-import com.example.goalflow.ui.activity.ActivityViewModel
+import com.example.goalflow.ui.activity.ActivityListScreen
+import com.example.goalflow.ui.activity.provideActivityViewModel
 import com.example.goalflow.ui.components.ActivityDialog
-
-data class TabItem(
-	val title: String,
-	val selectedIcon: ImageVector,
-	val unselectedIcon: ImageVector,
-	val route: String
-)
-
-val tabItems = listOf(
-	TabItem(
-		title = "Goals",
-		selectedIcon = Icons.Filled.RocketLaunch,
-		unselectedIcon = Icons.Outlined.RocketLaunch,
-		route = "goals?isFirstTab=true"
-	), TabItem(
-		title = "Distractions",
-		selectedIcon = Icons.Filled.SportsEsports,
-		unselectedIcon = Icons.Outlined.SportsEsports,
-		route = "distractions?isFirstTab=false"
-	)
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActivityTabPager(modifier: Modifier = Modifier) {
+fun ActivityTabPager(
+	modifier: Modifier = Modifier, setActiveActivityTab: (ActivityTabType) -> Unit
+) {
 	val startTabIndex = 0
-	var selectedDestination by rememberSaveable {
+	var selectedTab by rememberSaveable {
 		mutableIntStateOf(startTabIndex)
 	}
 
 	val pagerState = rememberPagerState {
 		tabItems.size
 	}
-	LaunchedEffect(selectedDestination) {
-		pagerState.animateScrollToPage(selectedDestination)
+	LaunchedEffect(selectedTab) {
+		pagerState.animateScrollToPage(selectedTab)
 	}
 	LaunchedEffect(pagerState.currentPage) {
-		selectedDestination = pagerState.currentPage
+		selectedTab = pagerState.currentPage
 	}
 
 	Column(modifier = modifier) {
-		TabRow(selectedTabIndex = selectedDestination) {
-			tabItems.forEachIndexed { index, tabItem ->
-				Tab(selected = selectedDestination == index, onClick = {
-					selectedDestination = index
-				}, text = {
-					Text(
-						text = tabItem.title, maxLines = 2, overflow = TextOverflow.Ellipsis
-					)
-				}, icon = {
-					Icon(
-						imageVector = if (selectedDestination == index) {
-							tabItem.selectedIcon
-						} else tabItem.unselectedIcon, contentDescription = tabItem.title
-					)
-				})
-			}
-		}
-
+		ActivityTabs(
+			selectedTab = selectedTab,
+			setSelectedTab = { selectedTab = it },
+			setActiveActivityTab = setActiveActivityTab
+		)
 		HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
-			val isGoal = (page == 0)
-			ActivityListScreenWithFactory(isGoal = isGoal)
+			val activityViewModel = provideActivityViewModel(tabItems[page].type)
+			ActivityListScreen(activityViewModel = activityViewModel)
 		}
 	}
 }
@@ -109,43 +69,31 @@ fun ActivityTabPager(modifier: Modifier = Modifier) {
 @Composable
 fun ScoreComposable(modifier: Modifier, score: String) {
 	Box(
-		modifier = modifier
-			.fillMaxSize(),
-		contentAlignment = Alignment.Center
+		modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center
 	) {
 		Text(
-			text = score,
-			style = MaterialTheme.typography.headlineLarge,
-			fontSize = 60.sp
+			text = score, style = MaterialTheme.typography.headlineLarge, fontSize = 60.sp
 		)
 	}
 }
 
 @Composable
-private fun AddActivityDialog(
-    show: Boolean, 
-    onDismiss: () -> Unit, 
-    onSave: (String, Int) -> Unit
+private fun AddActivityDialogHandler(
+	show: Boolean, onDismiss: () -> Unit, onSave: (String, Int) -> Unit
 ) {
-    if (show) {
-        ActivityDialog(
-            onDismiss = onDismiss, 
-            onSave = { name, weight -> onSave(name, weight) }
-        )
-    }
+	if (show) {
+		ActivityDialog(
+			onDismiss = onDismiss, onSave = { name, weight -> onSave(name, weight) })
+	}
 }
 
 @Composable
 fun HomeScreen(
 	homeViewModel: HomeViewModel = hiltViewModel(),
-	activityViewModel: ActivityViewModel = hiltViewModel(
-		key = "goal",
-		creationCallback = { factory: ActivityViewModel.ActivityViewModelFactory ->
-			factory.create(isGoal = true)
-		}
-	)
 ) {
 	val uiState by homeViewModel.score.collectAsState()
+	val activityViewModel = provideActivityViewModel(homeViewModel.currentActivityTab.value)
+
 	val showAddActivityDialog by activityViewModel.showAddActivityDialog.collectAsState()
 
 
@@ -164,7 +112,10 @@ fun HomeScreen(
 						.padding(10.dp)
 				) {
 					ScoreComposable(modifier = Modifier.weight(1f), score.toString())
-					ActivityTabPager(Modifier.weight(2f))
+					ActivityTabPager(
+						Modifier.weight(2f),
+						setActiveActivityTab = homeViewModel::setCurrentActivityTab
+					)
 				}
 
 				FloatingActionButton(
@@ -179,7 +130,8 @@ fun HomeScreen(
 				}
 			}
 		}
-		AddActivityDialog(
+
+		AddActivityDialogHandler(
 			show = showAddActivityDialog,
 			onDismiss = { activityViewModel.onAddActivityDismiss() },
 			onSave = { name, weight ->

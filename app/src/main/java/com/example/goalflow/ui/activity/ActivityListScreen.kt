@@ -17,13 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.goalflow.data.activity.ActivityItem
@@ -48,7 +44,7 @@ import com.example.goalflow.ui.components.DeleteConfirmationDialog
 import com.example.goalflow.ui.home.HomeViewModel
 
 @Composable
-private fun DeleteActivityDialog(
+private fun DeleteActivityDialogHandler(
 	show: Boolean,
 	selectedActivity: ActivityItem?,
 	onDismiss: () -> Unit,
@@ -64,7 +60,7 @@ private fun DeleteActivityDialog(
 }
 
 @Composable
-private fun EditActivityDialog(
+private fun EditActivityDialogHandler(
 	show: Boolean,
 	selectedActivity: ActivityItem?,
 	onDismiss: () -> Unit,
@@ -81,7 +77,7 @@ private fun EditActivityDialog(
 }
 
 @Composable
-private fun ActivityTimePickerDialog(
+private fun ActivityTimePickerDialogHandler(
 	show: Boolean, onDismiss: () -> Unit, onConfirm: (Int, Int) -> Unit
 ) {
 	if (show) {
@@ -93,8 +89,7 @@ private fun ActivityTimePickerDialog(
 
 @Composable
 fun ActivityListScreen(
-	activityViewModel: ActivityViewModel,
-	homeViewModel: HomeViewModel = hiltViewModel()
+	activityViewModel: ActivityViewModel, homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 	// Call loadActivities() once when the screen is first composed
 	LaunchedEffect(Unit) {
@@ -124,7 +119,7 @@ fun ActivityListScreen(
 	val showEditDialog by activityViewModel.showEditDialog.collectAsState()
 	val showTimePickerDialog by activityViewModel.showTimePickerDialog.collectAsState()
 
-	DeleteActivityDialog(
+	DeleteActivityDialogHandler(
 		show = showDeleteDialog,
 		selectedActivity = selectedActivity,
 		onDismiss = { activityViewModel.onDeleteDialogDismiss() },
@@ -133,7 +128,7 @@ fun ActivityListScreen(
 			activityViewModel.onDeleteDialogDismiss()
 		})
 
-	EditActivityDialog(
+	EditActivityDialogHandler(
 		show = showEditDialog,
 		selectedActivity = selectedActivity,
 		onDismiss = { activityViewModel.onEditDialogDismiss() },
@@ -144,13 +139,13 @@ fun ActivityListScreen(
 					name = name, weight = weight
 				)
 
-				else -> return@EditActivityDialog
+				else -> return@EditActivityDialogHandler
 			}
 			activityViewModel.update(updated)
 			activityViewModel.onEditDialogDismiss()
 		})
 
-	ActivityTimePickerDialog(
+	ActivityTimePickerDialogHandler(
 		show = showTimePickerDialog,
 		onDismiss = { activityViewModel.onTimePickerDismiss() },
 		onConfirm = { hour, minute ->
