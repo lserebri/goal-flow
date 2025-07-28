@@ -1,6 +1,5 @@
 package com.example.goalflow.ui.activity
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.goalflow.data.activity.ActivityItem
@@ -8,33 +7,84 @@ import com.example.goalflow.data.activity.ActivityRepository
 import com.example.goalflow.data.distraction.Distraction
 import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.ui.activity.ActivityUIState.*
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 
-@HiltViewModel
-class ActivityViewModel @Inject constructor (
+@HiltViewModel(assistedFactory = ActivityViewModel.ActivityViewModelFactory::class)
+class ActivityViewModel @AssistedInject constructor (
 	@Named("goalActivity") private val goalRepository: ActivityRepository<Goal>,
 	@Named("distractionActivity") private val distractionRepository: ActivityRepository<Distraction>,
-	savedStateHandle: SavedStateHandle
+	@Assisted val isGoal: Boolean
 ) : ViewModel() {
-	private val isFirstTab: Boolean = savedStateHandle["isFirstTab"] ?: true
 
-	private val activeRepo = if (isFirstTab) goalRepository else distractionRepository
+	private fun getActiveRepo() = if (isGoal) goalRepository else distractionRepository
+
+	private val _showDeleteDialog = MutableStateFlow(false)
+	val showDeleteDialog: StateFlow<Boolean> = _showDeleteDialog
+
+	private val _showAddActivityDialog = MutableStateFlow(false)
+	val showAddActivityDialog: StateFlow<Boolean> = _showAddActivityDialog
+
+	private val _showEditDialog = MutableStateFlow(false)
+	val showEditDialog: StateFlow<Boolean> = _showEditDialog
 
 
-	val getAll: StateFlow<ActivityUIState> = activeRepo
+	private val _showTimePickerDialog = MutableStateFlow(false)
+	val showTimePickerDialog: StateFlow<Boolean> = _showTimePickerDialog
+
+	private val _selectedActivity = MutableStateFlow<ActivityItem?>(null)
+	val selectedActivity: StateFlow<ActivityItem?> = _selectedActivity
+
+	private val _activities = MutableStateFlow<List<ActivityUI>>(emptyList())
+	val activities: StateFlow<List<ActivityUI>> = _activities
+
+
+	fun loadActivities() {
+		viewModelScope.launch {
+			getActiveRepo().getAll
+				.map { list ->
+					list.map { ActivityUI(it) }
+						.sortedByDescending { it.activity.weight }
+				}
+				.catch { _activities.value = emptyList() }
+				.collect { sortedList ->
+					_activities.value = sortedList
+				}
+		}
+	}
+
+	fun onAddActivityClick() { _showAddActivityDialog.value = true }
+	fun onAddActivityDismiss() { _showAddActivityDialog.value = false }
+	fun onSelectActivity(activity: ActivityItem?) { _selectedActivity.value = activity }
+	fun onDeleteDialogShow() { _showDeleteDialog.value = true }
+	fun onDeleteDialogDismiss() { _showDeleteDialog.value = false }
+	fun onEditDialogShow() { _showEditDialog.value = true }
+	fun onEditDialogDismiss() { _showEditDialog.value = false }
+	fun onTimePickerShow() { _showTimePickerDialog.value = true }
+	fun onTimePickerDismiss() { _showTimePickerDialog.value = false }
+
+
+	@AssistedFactory
+	interface ActivityViewModelFactory {
+		fun create(isGoal: Boolean): ActivityViewModel
+	}
+
+	val getAll: StateFlow<ActivityUIState> = getActiveRepo()
 		.getAll.map<List<ActivityItem>, ActivityUIState>(::Success)
 		.catch { emit(Error(it)) }
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
 
 	fun add(activityItem: ActivityItem) {
 		viewModelScope.launch {
-			if (activityItem is Goal && isFirstTab) {
+			if (activityItem is Goal && isGoal) {
 				goalRepository.insert(activityItem)
-			} else if (activityItem is Distraction && !isFirstTab) {
+			} else if (activityItem is Distraction && !isGoal) {
 				distractionRepository.insert(activityItem)
 			} else {
 				throw IllegalArgumentException("Invalid type for the current repository")
@@ -45,9 +95,9 @@ class ActivityViewModel @Inject constructor (
 
 	fun update(activityItem: ActivityItem) {
 		viewModelScope.launch {
-			if (activityItem is Goal && isFirstTab) {
+			if (activityItem is Goal && isGoal) {
 				goalRepository.update(activityItem)
-			} else if (activityItem is Distraction && !isFirstTab) {
+			} else if (activityItem is Distraction && !isGoal) {
 				distractionRepository.update(activityItem)
 			} else {
 				throw IllegalArgumentException("Invalid type for the current repository")
@@ -57,9 +107,9 @@ class ActivityViewModel @Inject constructor (
 
 	fun delete(activityItem: ActivityItem) {
 		viewModelScope.launch {
-			if (activityItem is Goal && isFirstTab) {
+			if (activityItem is Goal && isGoal) {
 				goalRepository.delete(activityItem)
-			} else if (activityItem is Distraction && !isFirstTab) {
+			} else if (activityItem is Distraction && !isGoal) {
 				distractionRepository.delete(activityItem)
 			} else {
 				throw IllegalArgumentException("Invalid type for the current repository")

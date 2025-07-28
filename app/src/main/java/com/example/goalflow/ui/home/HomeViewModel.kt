@@ -1,5 +1,7 @@
 package com.example.goalflow.ui.home
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.goalflow.data.score.Score
@@ -19,6 +21,13 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val scoreRepository: ScoreRepository,
 ): ViewModel() {
+    private val _currentActivityTab = mutableStateOf(ActivityTabType.GOALS)
+    val currentActivityTab: State<ActivityTabType> = _currentActivityTab
+
+    fun setCurrentActivityTab(newType: ActivityTabType) {
+        _currentActivityTab.value = newType
+    }
+
     val score: StateFlow<ScoreUiState> = scoreRepository
         .getScore.map<Int, ScoreUiState> (::Success)
         .catch { emit(Error(it)) }
