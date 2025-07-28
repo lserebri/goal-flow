@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.RocketLaunch
@@ -34,7 +35,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.goalflow.data.distraction.Distraction
+import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.ui.activity.ActivityListScreenWithFactory
+import com.example.goalflow.ui.activity.ActivityViewModel
+import com.example.goalflow.ui.components.ActivityDialog
 
 data class TabItem(
 	val title: String,
@@ -59,7 +64,7 @@ val tabItems = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationTab(modifier: Modifier = Modifier) {
+fun ActivityTabPager(modifier: Modifier = Modifier) {
 	val startTabIndex = 0
 	var selectedDestination by rememberSaveable {
 		mutableIntStateOf(startTabIndex)
@@ -102,36 +107,91 @@ fun NavigationTab(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HomeScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
+fun ScoreComposable(modifier: Modifier, score: String) {
+	Box(
+		modifier = modifier
+			.fillMaxSize(),
+		contentAlignment = Alignment.Center
+	) {
+		Text(
+			text = score,
+			style = MaterialTheme.typography.headlineLarge,
+			fontSize = 60.sp
+		)
+	}
+}
+
+@Composable
+private fun AddActivityDialog(
+    show: Boolean, 
+    onDismiss: () -> Unit, 
+    onSave: (String, Int) -> Unit
+) {
+    if (show) {
+        ActivityDialog(
+            onDismiss = onDismiss, 
+            onSave = { name, weight -> onSave(name, weight) }
+        )
+    }
+}
+
+@Composable
+fun HomeScreen(
+	homeViewModel: HomeViewModel = hiltViewModel(),
+	activityViewModel: ActivityViewModel = hiltViewModel(
+		key = "goal",
+		creationCallback = { factory: ActivityViewModel.ActivityViewModelFactory ->
+			factory.create(isGoal = true)
+		}
+	)
+) {
 	val uiState by homeViewModel.score.collectAsState()
+	val showAddActivityDialog by activityViewModel.showAddActivityDialog.collectAsState()
+
 
 	if (uiState is ScoreUiState.Success) {
 		val score = (uiState as ScoreUiState.Success).data
 
 		Scaffold { contentPadding ->
-			Column(
+			Box(
 				modifier = Modifier
 					.padding(contentPadding)
 					.fillMaxSize()
-					.padding(10.dp)
 			) {
-				Box(
+				Column(
 					modifier = Modifier
 						.fillMaxSize()
-						.weight(1f),
-					contentAlignment = Alignment.Center
+						.padding(10.dp)
 				) {
-					Text(
-						text = score.toString(),
-						style = MaterialTheme.typography.headlineLarge,
-						fontSize = 60.sp
-					)
+					ScoreComposable(modifier = Modifier.weight(1f), score.toString())
+					ActivityTabPager(Modifier.weight(2f))
 				}
 
-				NavigationTab(modifier = Modifier.weight(2f))
+				FloatingActionButton(
+					shape = RoundedCornerShape(16.dp),
+					onClick = { activityViewModel.onAddActivityClick() },
+					containerColor = MaterialTheme.colorScheme.secondary,
+					modifier = Modifier
+						.align(Alignment.BottomEnd)
+						.padding(26.dp)
+				) {
+					Icon(Icons.Filled.Add, "Floating action button.")
+				}
 			}
 		}
+		AddActivityDialog(
+			show = showAddActivityDialog,
+			onDismiss = { activityViewModel.onAddActivityDismiss() },
+			onSave = { name, weight ->
+				activityViewModel.add(
+					if (activityViewModel.isGoal) Goal(name = name, weight = weight)
+					else Distraction(name = name, weight = weight)
+				)
+				activityViewModel.onAddActivityDismiss()
+			})
 	}
 }
+
+
 
 

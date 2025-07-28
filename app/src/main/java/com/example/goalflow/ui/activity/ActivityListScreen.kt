@@ -81,18 +81,6 @@ private fun EditActivityDialog(
 }
 
 @Composable
-private fun AddActivityDialog(
-	show: Boolean, isGoal: Boolean, onDismiss: () -> Unit, onSave: (String, Int) -> Unit
-) {
-	if (show) {
-		ActivityDialog(
-			onDismiss = onDismiss, onSave = { name, weight ->
-				onSave(name, weight)
-			})
-	}
-}
-
-@Composable
 private fun ActivityTimePickerDialog(
 	show: Boolean, onDismiss: () -> Unit, onConfirm: (Int, Int) -> Unit
 ) {
@@ -105,7 +93,6 @@ private fun ActivityTimePickerDialog(
 
 @Composable
 fun ActivityListScreen(
-	isGoal: Boolean,
 	activityViewModel: ActivityViewModel,
 	homeViewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -118,9 +105,6 @@ fun ActivityListScreen(
 
 	ActivityListComposable(
 		activityUIList,
-		onAddActivityButtonClick = {
-			activityViewModel.onAddActivityClick()
-		},
 		onEditClick = {
 			activityViewModel.onSelectActivity(it)
 			activityViewModel.onEditDialogShow()
@@ -136,7 +120,6 @@ fun ActivityListScreen(
 	)
 
 	val showDeleteDialog by activityViewModel.showDeleteDialog.collectAsState()
-	val showAddActivityDialog by activityViewModel.showAddActivityDialog.collectAsState()
 	val selectedActivity by activityViewModel.selectedActivity.collectAsState()
 	val showEditDialog by activityViewModel.showEditDialog.collectAsState()
 	val showTimePickerDialog by activityViewModel.showTimePickerDialog.collectAsState()
@@ -167,25 +150,13 @@ fun ActivityListScreen(
 			activityViewModel.onEditDialogDismiss()
 		})
 
-	AddActivityDialog(
-		show = showAddActivityDialog,
-		isGoal = isGoal,
-		onDismiss = { activityViewModel.onAddActivityDismiss() },
-		onSave = { name, weight ->
-			activityViewModel.add(
-				if (isGoal) Goal(name = name, weight = weight)
-				else Distraction(name = name, weight = weight)
-			)
-			activityViewModel.onAddActivityDismiss()
-		})
-
 	ActivityTimePickerDialog(
 		show = showTimePickerDialog,
 		onDismiss = { activityViewModel.onTimePickerDismiss() },
 		onConfirm = { hour, minute ->
 			selectedActivity?.let {
 				homeViewModel.updateScore(
-					(hour * 60 + minute), it.weight, isGoal = isGoal
+					(hour * 60 + minute), it.weight, isGoal = activityViewModel.isGoal
 				)
 			}
 			activityViewModel.onTimePickerDismiss()
@@ -197,8 +168,7 @@ fun ActivityListComposable(
 	activities: List<ActivityUI>,
 	onEditClick: (ActivityItem) -> Unit,
 	onDeleteClick: (ActivityItem) -> Unit,
-	onActivityClick: (ActivityItem) -> Unit,
-	onAddActivityButtonClick: () -> Unit,
+	onActivityClick: (ActivityItem) -> Unit
 ) {
 	var cardHeight by remember { mutableStateOf(100.dp) }
 
@@ -219,7 +189,6 @@ fun ActivityListComposable(
 					ActivityComposable(
 						activity = activityItem.activity,
 						onEditClick = onEditClick,
-
 						onDeleteClick = onDeleteClick,
 						onActivityClick = onActivityClick,
 						modifier = Modifier.height(cardHeight)
@@ -229,22 +198,6 @@ fun ActivityListComposable(
 			}
 		}
 		Spacer(modifier = Modifier.size(2.dp))
-		Card(
-			modifier = Modifier
-				.height(cardHeight)
-				.align(Alignment.CenterHorizontally)
-		) {
-			FloatingActionButton(
-				shape = RectangleShape,
-				onClick = onAddActivityButtonClick,
-				modifier = Modifier
-					.align(Alignment.CenterHorizontally)
-					.weight(1f)
-					.fillMaxWidth()
-			) {
-				Icon(Icons.Filled.Add, "Floating action button.")
-			}
-		}
 	}
 }
 
@@ -261,6 +214,7 @@ fun ActivityComposable(
 		modifier = modifier
 			.clickable { onActivityClick(activity) }
 			.fillMaxWidth()
+			.padding(horizontal = 4.dp)
 			.fillMaxHeight(),
 	) {
 		Row(
@@ -327,7 +281,6 @@ fun ActivityListPreview() {
 		Spacer(modifier = Modifier.size(200.dp))
 		ActivityListComposable(
 			activities,
-			onAddActivityButtonClick = {},
 			onEditClick = {},
 			onDeleteClick = {},
 			onActivityClick = {},

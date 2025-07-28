@@ -1,6 +1,5 @@
 package com.example.goalflow.ui.activity
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.goalflow.data.activity.ActivityItem
@@ -21,7 +20,7 @@ import javax.inject.Named
 class ActivityViewModel @AssistedInject constructor (
 	@Named("goalActivity") private val goalRepository: ActivityRepository<Goal>,
 	@Named("distractionActivity") private val distractionRepository: ActivityRepository<Distraction>,
-	@Assisted private val isGoal: Boolean
+	@Assisted val isGoal: Boolean
 ) : ViewModel() {
 
 	private fun getActiveRepo() = if (isGoal) goalRepository else distractionRepository

@@ -14,7 +14,6 @@ fun ActivityListScreenWithFactory(
 		}
 	)
 	ActivityListScreen(
-		isGoal = isGoal,
 		activityViewModel = viewModel,
 	)
 }
