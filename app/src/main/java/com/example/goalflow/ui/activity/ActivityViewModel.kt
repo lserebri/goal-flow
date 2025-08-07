@@ -47,7 +47,7 @@ class ActivityViewModel @AssistedInject constructor (
 
 	fun loadActivities() {
 		viewModelScope.launch {
-			getActiveRepo().getAll
+			getActiveRepo().getAll()
 				.map { list ->
 					list.map { ActivityUI(it) }
 						.sortedByDescending { it.activity.weight }
@@ -75,10 +75,13 @@ class ActivityViewModel @AssistedInject constructor (
 		fun create(isGoal: Boolean): ActivityViewModel
 	}
 
-	val getAll: StateFlow<ActivityUIState> = getActiveRepo()
-		.getAll.map<List<ActivityItem>, ActivityUIState>(::Success)
-		.catch { emit(Error(it)) }
-		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
+	fun getAll(): StateFlow<ActivityUIState> {
+		return getActiveRepo()
+			.getAll()
+			.map<List<ActivityItem>, ActivityUIState>(::Success)
+			.catch { emit(Error(it)) }
+			.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
+	}
 
 	fun add(activityItem: ActivityItem) {
 		viewModelScope.launch {

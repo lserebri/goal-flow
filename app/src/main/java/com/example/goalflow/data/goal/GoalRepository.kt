@@ -7,7 +7,7 @@ import javax.inject.Inject
 class GoalRepository @Inject constructor(
     private val goalDao: GoalDao
 ) : ActivityRepository<Goal>(goalDao) {
-    override val getAll: Flow<List<Goal>> = goalDao.getAll()
+    override fun getAll(): Flow<List<Goal>> = goalDao.getAll()
 
     override suspend fun insert(activity: Goal) = goalDao.insert(activity)
 

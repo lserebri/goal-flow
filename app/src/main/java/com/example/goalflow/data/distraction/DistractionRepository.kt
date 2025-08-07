@@ -7,7 +7,7 @@ import javax.inject.Inject
 class DistractionRepository @Inject constructor(
     private val distractionDao: DistractionDao
 ) : ActivityRepository<Distraction>(distractionDao) {
-    override val getAll: Flow<List<Distraction>> = distractionDao.getAll()
+    override fun getAll(): Flow<List<Distraction>> = distractionDao.getAll()
 
     override suspend fun insert(activity: Distraction) = distractionDao.insert(activity)
 
