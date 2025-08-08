@@ -75,14 +75,6 @@ class ActivityViewModel @AssistedInject constructor (
 		fun create(isGoal: Boolean): ActivityViewModel
 	}
 
-	fun getAll(): StateFlow<ActivityUIState> {
-		return getActiveRepo()
-			.getAll()
-			.map<List<ActivityItem>, ActivityUIState>(::Success)
-			.catch { emit(Error(it)) }
-			.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
-	}
-
 	fun add(activityItem: ActivityItem) {
 		viewModelScope.launch {
 			if (activityItem is Goal && isGoal) {

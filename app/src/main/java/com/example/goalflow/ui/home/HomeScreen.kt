@@ -92,6 +92,7 @@ fun HomeScreen(
 	homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
 	val uiState by homeViewModel.score.collectAsState()
+
 	val activityViewModel = provideActivityViewModel(homeViewModel.currentActivityTab.value)
 
 	val showAddActivityDialog by activityViewModel.showAddActivityDialog.collectAsState()

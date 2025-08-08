@@ -10,7 +10,7 @@ import com.example.goalflow.data.distraction.DistractionDao
 import com.example.goalflow.data.distraction.DistractionRepository
 import com.example.goalflow.data.goal.Goal
 import com.example.goalflow.data.goal.GoalRepository
-import com.example.goalflow.data.score.RealScoreRepository
+import com.example.goalflow.data.score.ScoreRepositoryImplementation
 import com.example.goalflow.data.score.ScoreDao
 import com.example.goalflow.data.score.ScoreRepository
 import dagger.Module
@@ -63,6 +63,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provideScoreRepository(dao: ScoreDao): ScoreRepository {
-        return RealScoreRepository(dao)
+        return ScoreRepositoryImplementation(dao)
     }
 }
