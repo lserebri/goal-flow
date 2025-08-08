@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,33 +31,33 @@ class HomeViewModel @Inject constructor(
 		_currentActivityTab.value = newType
 	}
 
-//    suspend fun getScore(): StateFlow<ScoreUiState> {
-//        return scoreRepository
-//            .getScore().map<Int, ScoreUiState> (::Success)
-//            .catch { emit(Error(it)) }
-//            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
-//    }
-
 	val score: StateFlow<ScoreUiState> = flow {
 		emitAll(scoreRepository.getScore())
 	}.map<Int, ScoreUiState>(::Success)
-		.catch { emit(Error(it)) }
+		.catch { error ->
+			Timber.e(error, "Failed to load score")
+			emit(Error(error))
+		}
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
 
 
 	fun updateScore(minutes: Int, weight: Int, isGoal: Boolean) {
 		viewModelScope.launch {
-			val currentScore = scoreRepository.getScore().first()
+			try {
+				val currentScore = scoreRepository.getScore().first()
+				val deltaPoints = ((minutes.toFloat() / 60f) * weight).toInt()
+				val newScore = if (isGoal) {
+					currentScore + deltaPoints
+				} else {
+					(currentScore - deltaPoints).coerceAtLeast(0)
+				}
 
-			val deltaPoints = ((minutes.toFloat() / 60f) * weight).toInt()
-
-			val newScore = if (isGoal) {
-				currentScore + deltaPoints
-			} else {
-				(currentScore - deltaPoints).coerceAtLeast(0)
+				scoreRepository.updateScore(Score(score = newScore))
+				Timber.d("Score updated: $currentScore -> $newScore (${if (isGoal) "goal" else "distraction"})")
+			} catch (e: Exception) {
+				Timber.e(e, "Failed to update score for minutes: $minutes, weight: $weight, isGoal: $isGoal")
+				throw e
 			}
-
-			scoreRepository.updateScore(Score(score = newScore))
 		}
 	}
 }

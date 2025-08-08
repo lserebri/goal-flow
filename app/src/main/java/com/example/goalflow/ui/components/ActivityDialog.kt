@@ -12,13 +12,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
+import timber.log.Timber
 
 @Composable
 fun ActivityDialog(
 	onDismiss: () -> Unit,
 	onSave: (String, Int) -> Unit,
 	initialName: String = "",
-	initialWeight: Int = 1
+	initialWeight: Int = 0,
 ) {
 	var name by remember { mutableStateOf(initialName) }
 	var weight by remember { mutableStateOf(initialWeight.toString()) }
@@ -30,11 +31,14 @@ fun ActivityDialog(
 			Column {
 				OutlinedTextField(
 					value = name,
+					singleLine = true,
 					onValueChange = { name = it },
 					label = { Text("Name") }
 				)
 				OutlinedTextField(
-					value = weight,
+					value = if (weight == "0") ""  else weight,
+					placeholder = { Text("From 1 to 10") },
+					singleLine = true,
 					onValueChange = { weight = it },
 					label = { Text("Weight") },
 					keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
@@ -43,7 +47,9 @@ fun ActivityDialog(
 		},
 		confirmButton = {
 			TextButton(onClick = {
-				onSave(name, weight.toIntOrNull() ?: 1)
+				val weightValue = weight.toIntOrNull() ?: 1
+				Timber.d("Saving activity: name='$name', weight=$weightValue")
+				onSave(name, weightValue)
 			}) {
 				Text("Save")
 			}
