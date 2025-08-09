@@ -79,9 +79,6 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
-    // Logging
-    implementation("com.jakewharton.timber:timber:5.0.1")
-
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

@@ -13,8 +13,6 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
 import javax.inject.Named
 
 @HiltViewModel(assistedFactory = ActivityViewModel.ActivityViewModelFactory::class)
@@ -24,6 +22,10 @@ class ActivityViewModel @AssistedInject constructor (
 	@Assisted val isGoal: Boolean
 ) : ViewModel() {
 
+	@AssistedFactory
+	interface ActivityViewModelFactory {
+		fun create(isGoal: Boolean): ActivityViewModel
+	}
 	private fun getActiveRepo() = if (isGoal) goalRepository else distractionRepository
 
 	private val _showDeleteDialog = MutableStateFlow(false)
@@ -54,8 +56,8 @@ class ActivityViewModel @AssistedInject constructor (
 						.sortedByDescending { it.activity.weight }
 				}
 				.catch { error ->
-					Timber.e(error, "Failed to load activities for type: ${if (isGoal) "Goal" else "Distraction"}")
 					_activities.value = emptyList()
+					throw error
 				}
 				.collect { sortedList ->
 					_activities.value = sortedList
@@ -73,28 +75,18 @@ class ActivityViewModel @AssistedInject constructor (
 	fun onTimePickerShow() { _showTimePickerDialog.value = true }
 	fun onTimePickerDismiss() { _showTimePickerDialog.value = false }
 
-
-	@AssistedFactory
-	interface ActivityViewModelFactory {
-		fun create(isGoal: Boolean): ActivityViewModel
-	}
-
 	fun add(activityItem: ActivityItem) {
 		viewModelScope.launch {
 			try {
 				if (activityItem is Goal && isGoal) {
 					goalRepository.insert(activityItem)
-					Timber.d("Successfully added goal: ${activityItem.name}")
 				} else if (activityItem is Distraction && !isGoal) {
 					distractionRepository.insert(activityItem)
-					Timber.d("Successfully added distraction: ${activityItem.name}")
 				} else {
 					val error = IllegalArgumentException("Invalid type for the current repository")
-					Timber.e(error, "Failed to add activity: ${activityItem.javaClass.simpleName} for isGoal: $isGoal")
 					throw error
 				}
 			} catch (e: Exception) {
-				Timber.e(e, "Failed to add activity: ${activityItem.name}")
 				throw e
 			}
 		}
@@ -105,17 +97,13 @@ class ActivityViewModel @AssistedInject constructor (
 			try {
 				if (activityItem is Goal && isGoal) {
 					goalRepository.update(activityItem)
-					Timber.d("Successfully updated goal: ${activityItem.name}")
 				} else if (activityItem is Distraction && !isGoal) {
 					distractionRepository.update(activityItem)
-					Timber.d("Successfully updated distraction: ${activityItem.name}")
 				} else {
 					val error = IllegalArgumentException("Invalid type for the current repository")
-					Timber.e(error, "Failed to update activity: ${activityItem.javaClass.simpleName} for isGoal: $isGoal")
 					throw error
 				}
 			} catch (e: Exception) {
-				Timber.e(e, "Failed to update activity: ${activityItem.name}")
 				throw e
 			}
 		}
@@ -126,17 +114,13 @@ class ActivityViewModel @AssistedInject constructor (
 			try {
 				if (activityItem is Goal && isGoal) {
 					goalRepository.delete(activityItem)
-					Timber.d("Successfully deleted goal: ${activityItem.name}")
 				} else if (activityItem is Distraction && !isGoal) {
 					distractionRepository.delete(activityItem)
-					Timber.d("Successfully deleted distraction: ${activityItem.name}")
 				} else {
 					val error = IllegalArgumentException("Invalid type for the current repository")
-					Timber.e(error, "Failed to delete activity: ${activityItem.javaClass.simpleName} for isGoal: $isGoal")
 					throw error
 				}
 			} catch (e: Exception) {
-				Timber.e(e, "Failed to delete activity: ${activityItem.name}")
 				throw e
 			}
 		}

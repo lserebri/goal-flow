@@ -12,8 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
-import timber.log.Timber
-
 @Composable
 fun ActivityDialog(
 	onDismiss: () -> Unit,
@@ -23,6 +21,11 @@ fun ActivityDialog(
 ) {
 	var name by remember { mutableStateOf(initialName) }
 	var weight by remember { mutableStateOf(initialWeight.toString()) }
+
+	val weightNum = weight.toIntOrNull()
+
+	val isWeightValid = weightNum != null && weightNum in 1..10
+	val isFormValid = isWeightValid
 
 	AlertDialog(
 		onDismissRequest = onDismiss,
@@ -36,21 +39,26 @@ fun ActivityDialog(
 					label = { Text("Name") }
 				)
 				OutlinedTextField(
-					value = if (weight == "0") ""  else weight,
-					placeholder = { Text("From 1 to 10") },
+					value = if (weight == "0") "" else weight,
+					placeholder = { Text("1... 10") },
 					singleLine = true,
 					onValueChange = { weight = it },
 					label = { Text("Weight") },
-					keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-				)
+					isError = weight.isNotEmpty() && !isWeightValid,
+					keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+					supportingText = {
+						if (weight.isNotEmpty() && !isWeightValid) Text("Enter a number between 1 and 10")
+					})
 			}
 		},
 		confirmButton = {
-			TextButton(onClick = {
-				val weightValue = weight.toIntOrNull() ?: 1
-				Timber.d("Saving activity: name='$name', weight=$weightValue")
-				onSave(name, weightValue)
-			}) {
+			TextButton(
+				onClick = {
+					val weightValue = weight.toIntOrNull() ?: 1
+					onSave(name, weightValue)
+				},
+				enabled = isFormValid
+			) {
 				Text("Save")
 			}
 		},
