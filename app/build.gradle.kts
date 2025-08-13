@@ -5,6 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     id("dagger.hilt.android.plugin")
+    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 android {
@@ -71,10 +72,10 @@ dependencies {
     ksp("com.google.dagger:hilt-android-compiler:2.57")
 
     // Fragment
-    implementation ("androidx.navigation:navigation-fragment-ktx:2.9.2")
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.9.3")
 
     // Navigation
-    implementation ("androidx.navigation:navigation-ui-ktx:2.9.2")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.9.3")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
@@ -87,5 +88,4 @@ dependencies {
 
 
     implementation ("androidx.compose.material:material-icons-extended")
-
 }
