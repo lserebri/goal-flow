@@ -136,7 +136,7 @@ fun HomeScreen(
 			show = showAddActivityDialog,
 			onDismiss = { activityViewModel.onAddActivityDismiss() },
 			onSave = { name, weight ->
-				activityViewModel.add(
+				activityViewModel.addActivity(
 					if (activityViewModel.isGoal) Goal(name = name, weight = weight)
 					else Distraction(name = name, weight = weight)
 				)

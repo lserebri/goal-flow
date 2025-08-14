@@ -6,7 +6,6 @@ import com.example.goalflow.data.activity.ActivityItem
 import com.example.goalflow.data.activity.ActivityRepository
 import com.example.goalflow.data.distraction.Distraction
 import com.example.goalflow.data.goal.Goal
-import com.example.goalflow.ui.activity.ActivityUIState.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -17,8 +16,8 @@ import javax.inject.Named
 
 @HiltViewModel(assistedFactory = ActivityViewModel.ActivityViewModelFactory::class)
 class ActivityViewModel @AssistedInject constructor (
-	@Named("goalActivity") private val goalRepository: ActivityRepository<Goal>,
-	@Named("distractionActivity") private val distractionRepository: ActivityRepository<Distraction>,
+	@param:Named("goalActivity") private val goalRepository: ActivityRepository<Goal>,
+	@param:Named("distractionActivity") private val distractionRepository: ActivityRepository<Distraction>,
 	@Assisted val isGoal: Boolean
 ) : ViewModel() {
 
@@ -75,54 +74,27 @@ class ActivityViewModel @AssistedInject constructor (
 	fun onTimePickerShow() { _showTimePickerDialog.value = true }
 	fun onTimePickerDismiss() { _showTimePickerDialog.value = false }
 
-	fun add(activityItem: ActivityItem) {
-		viewModelScope.launch {
-			try {
-				if (activityItem is Goal && isGoal) {
-					goalRepository.insert(activityItem)
-				} else if (activityItem is Distraction && !isGoal) {
-					distractionRepository.insert(activityItem)
-				} else {
-					val error = IllegalArgumentException("Invalid type for the current repository")
-					throw error
-				}
-			} catch (e: Exception) {
-				throw e
-			}
+	fun addActivity(activityItem: ActivityItem) = viewModelScope.launch {
+		when {
+			activityItem is Goal && isGoal -> goalRepository.insert(activityItem)
+			activityItem is Distraction && !isGoal -> distractionRepository.insert(activityItem)
+			else -> throw IllegalArgumentException("Invalid type for the current repository")
 		}
 	}
 
-	fun update(activityItem: ActivityItem) {
-		viewModelScope.launch {
-			try {
-				if (activityItem is Goal && isGoal) {
-					goalRepository.update(activityItem)
-				} else if (activityItem is Distraction && !isGoal) {
-					distractionRepository.update(activityItem)
-				} else {
-					val error = IllegalArgumentException("Invalid type for the current repository")
-					throw error
-				}
-			} catch (e: Exception) {
-				throw e
-			}
+	fun updateActivity(activityItem: ActivityItem) = viewModelScope.launch {
+		when {
+			activityItem is Goal && isGoal -> goalRepository.update(activityItem)
+			activityItem is Distraction && !isGoal -> distractionRepository.update(activityItem)
+			else -> throw IllegalArgumentException("Invalid type for the current repository")
 		}
 	}
 
-	fun delete(activityItem: ActivityItem) {
-		viewModelScope.launch {
-			try {
-				if (activityItem is Goal && isGoal) {
-					goalRepository.delete(activityItem)
-				} else if (activityItem is Distraction && !isGoal) {
-					distractionRepository.delete(activityItem)
-				} else {
-					val error = IllegalArgumentException("Invalid type for the current repository")
-					throw error
-				}
-			} catch (e: Exception) {
-				throw e
-			}
+	fun deleteActivity(activityItem: ActivityItem) = viewModelScope.launch {
+		when {
+			activityItem is Goal && isGoal -> goalRepository.delete(activityItem)
+			activityItem is Distraction && !isGoal -> distractionRepository.delete(activityItem)
+			else -> throw IllegalArgumentException("Invalid type for the current repository")
 		}
 	}
 }
