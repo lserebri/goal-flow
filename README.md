@@ -76,7 +76,7 @@ app/src/main/java/com/example/goalflow/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/goal-flow.git
+   git clone https://github.com/lserebri/goal-flow.git
    cd goal-flow
    ```
 
@@ -160,24 +160,6 @@ The project includes comprehensive testing:
 - Use meaningful variable and function names
 - Include proper documentation for public APIs
 - Follow MVVM architecture patterns
-
-### Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-- Open an issue on GitHub
-- Check the existing issues for solutions
-- Review the code documentation
 
 ---
 
