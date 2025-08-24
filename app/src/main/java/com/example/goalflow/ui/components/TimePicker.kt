@@ -1,3 +1,5 @@
+package com.example.goalflow.ui.components
+
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
@@ -264,7 +266,7 @@ private fun TimeColumn(
 
 
 @Composable
-fun TimePeackerPreview() {
+fun TimePickerPreview() {
 	TimePickerDialog(
 		initialHour = 0,
 		initialMinute = 0,
