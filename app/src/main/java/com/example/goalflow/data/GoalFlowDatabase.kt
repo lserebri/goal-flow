@@ -10,12 +10,12 @@ import com.example.goalflow.data.score.Score
 import com.example.goalflow.data.score.ScoreDao
 
 @Database(
-    entities = [Goal::class, Distraction::class, Score::class],
-    version = 3,
-    exportSchema = false
+	entities = [Goal::class, Distraction::class, Score::class],
+	version = 3,
+	exportSchema = false
 )
 abstract class GoalFlowDatabase : RoomDatabase() {
-    abstract fun goalDao(): GoalDao
-    abstract fun distractionDao(): DistractionDao
-    abstract fun scoreDao(): ScoreDao
+	abstract fun goalDao(): GoalDao
+	abstract fun distractionDao(): DistractionDao
+	abstract fun scoreDao(): ScoreDao
 }

@@ -31,8 +31,8 @@ fun TimePickerDialogPreview() {
 	TimePickerDialog(
 		initialHour = 0,
 		initialMinute = 0,
-		onDismiss = {  },
-		onConfirm = { _, _ ->  }
+		onDismiss = { },
+		onConfirm = { _, _ -> }
 	)
 }
 
@@ -123,7 +123,7 @@ fun TimePickerDialog(
 			shape = RoundedCornerShape(30.dp)
 
 
-			) {
+		) {
 			Column(
 				modifier = Modifier
 					.fillMaxWidth(),
@@ -270,7 +270,7 @@ fun TimePickerPreview() {
 	TimePickerDialog(
 		initialHour = 0,
 		initialMinute = 0,
-		onDismiss = {  },
-		onConfirm = { _, _ ->  }
+		onDismiss = { },
+		onConfirm = { _, _ -> }
 	)
 }

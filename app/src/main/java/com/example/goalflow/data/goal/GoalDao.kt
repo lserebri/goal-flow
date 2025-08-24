@@ -10,16 +10,16 @@ import com.example.goalflow.data.activity.ActivityDao
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface GoalDao: ActivityDao<Goal> {
-    @Query("SELECT * FROM goals")
-    fun getAll(): Flow<List<Goal>>
+interface GoalDao : ActivityDao<Goal> {
+	@Query("SELECT * FROM goals")
+	fun getAll(): Flow<List<Goal>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override suspend fun insert(activity: Goal)
-    
-    @Update
-    override suspend fun update(activity: Goal)
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	override suspend fun insert(activity: Goal)
 
-    @Delete
-    override suspend fun delete(activity: Goal)
+	@Update
+	override suspend fun update(activity: Goal)
+
+	@Delete
+	override suspend fun delete(activity: Goal)
 }

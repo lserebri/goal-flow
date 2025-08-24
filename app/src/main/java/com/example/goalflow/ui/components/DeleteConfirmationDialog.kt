@@ -18,8 +18,8 @@ fun DialogPreview() {
 	DeleteConfirmationDialog(
 		dialogTitle = "Delete Goal?",
 		dialogSubTitle = "Are you sure you want to delete this goal?",
-		onDismissRequest = {  },
-		onConfirmation = {  }
+		onDismissRequest = { },
+		onConfirmation = { }
 	)
 }
 

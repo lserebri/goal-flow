@@ -11,15 +11,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DistractionDao : ActivityDao<Distraction> {
-    @Query("SELECT * FROM distractions")
-    fun getAll(): Flow<List<Distraction>>
+	@Query("SELECT * FROM distractions")
+	fun getAll(): Flow<List<Distraction>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override suspend fun insert(activity: Distraction)
-    
-    @Update
-    override suspend fun update(activity: Distraction)
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	override suspend fun insert(activity: Distraction)
 
-    @Delete
-    override suspend fun delete(activity: Distraction)
+	@Update
+	override suspend fun update(activity: Distraction)
+
+	@Delete
+	override suspend fun delete(activity: Distraction)
 }

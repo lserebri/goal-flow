@@ -102,62 +102,74 @@ fun HomeScreen(
 	when (uiState) {
 		is ScoreUiState.Loading -> {
 			Scaffold { contentPadding ->
-				Box(modifier = Modifier.padding(contentPadding).fillMaxSize(), contentAlignment = Alignment.Center) {
+				Box(
+					modifier = Modifier
+						.padding(contentPadding)
+						.fillMaxSize(),
+					contentAlignment = Alignment.Center
+				) {
 					Text("Loading…")
 				}
 			}
 		}
+
 		is ScoreUiState.Error -> {
 			Scaffold { contentPadding ->
-				Box(modifier = Modifier.padding(contentPadding).fillMaxSize(), contentAlignment = Alignment.Center) {
+				Box(
+					modifier = Modifier
+						.padding(contentPadding)
+						.fillMaxSize(),
+					contentAlignment = Alignment.Center
+				) {
 					Text("Failed to load score")
 				}
 			}
 		}
+
 		is ScoreUiState.Success -> {
 			val score = (uiState as ScoreUiState.Success).data
 
-		Scaffold { contentPadding ->
-			Box(
-				modifier = Modifier
-					.padding(contentPadding)
-					.fillMaxSize()
-			) {
-				Column(
+			Scaffold { contentPadding ->
+				Box(
 					modifier = Modifier
+						.padding(contentPadding)
 						.fillMaxSize()
-						.padding(10.dp)
 				) {
-					ScoreComposable(modifier = Modifier.weight(1f), score.toString())
-					ActivityTabPager(
-						Modifier.weight(2f),
-						setActiveActivityTab = homeViewModel::setCurrentActivityTab
-					)
-				}
+					Column(
+						modifier = Modifier
+							.fillMaxSize()
+							.padding(10.dp)
+					) {
+						ScoreComposable(modifier = Modifier.weight(1f), score.toString())
+						ActivityTabPager(
+							Modifier.weight(2f),
+							setActiveActivityTab = homeViewModel::setCurrentActivityTab
+						)
+					}
 
-				FloatingActionButton(
-					shape = RoundedCornerShape(16.dp),
-					onClick = { activityViewModel.onAddActivityClick() },
-					containerColor = MaterialTheme.colorScheme.secondary,
-					modifier = Modifier
-						.align(Alignment.BottomEnd)
-						.padding(26.dp)
-				) {
-					Icon(Icons.Filled.Add, "Floating action button.")
+					FloatingActionButton(
+						shape = RoundedCornerShape(16.dp),
+						onClick = { activityViewModel.onAddActivityClick() },
+						containerColor = MaterialTheme.colorScheme.secondary,
+						modifier = Modifier
+							.align(Alignment.BottomEnd)
+							.padding(26.dp)
+					) {
+						Icon(Icons.Filled.Add, "Floating action button.")
+					}
 				}
 			}
-		}
 
-		AddActivityDialogHandler(
-			show = showAddActivityDialog,
-			onDismiss = { activityViewModel.onAddActivityDismiss() },
-			onSave = { name, weight ->
-				activityViewModel.addActivity(
-					if (activityViewModel.isGoal) Goal(name = name, weight = weight)
-					else Distraction(name = name, weight = weight)
-				)
-				activityViewModel.onAddActivityDismiss()
-			})
+			AddActivityDialogHandler(
+				show = showAddActivityDialog,
+				onDismiss = { activityViewModel.onAddActivityDismiss() },
+				onSave = { name, weight ->
+					activityViewModel.addActivity(
+						if (activityViewModel.isGoal) Goal(name = name, weight = weight)
+						else Distraction(name = name, weight = weight)
+					)
+					activityViewModel.onAddActivityDismiss()
+				})
 		}
 	}
 }

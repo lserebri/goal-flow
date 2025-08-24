@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Named
 
 @HiltViewModel(assistedFactory = ActivityViewModel.ActivityViewModelFactory::class)
-class ActivityViewModel @AssistedInject constructor (
+class ActivityViewModel @AssistedInject constructor(
 	@param:Named("goalActivity") private val goalRepository: ActivityRepository<Goal>,
 	@param:Named("distractionActivity") private val distractionRepository: ActivityRepository<Distraction>,
 	@Assisted val isGoal: Boolean
@@ -25,6 +25,7 @@ class ActivityViewModel @AssistedInject constructor (
 	interface ActivityViewModelFactory {
 		fun create(isGoal: Boolean): ActivityViewModel
 	}
+
 	private fun getActiveRepo() = if (isGoal) goalRepository else distractionRepository
 
 	private val _showDeleteDialog = MutableStateFlow(false)
@@ -56,7 +57,6 @@ class ActivityViewModel @AssistedInject constructor (
 				}
 				.catch { error ->
 					_activities.value = emptyList()
-					throw error
 				}
 				.collect { sortedList ->
 					_activities.value = sortedList
@@ -64,15 +64,41 @@ class ActivityViewModel @AssistedInject constructor (
 		}
 	}
 
-	fun onAddActivityClick() { _showAddActivityDialog.value = true }
-	fun onAddActivityDismiss() { _showAddActivityDialog.value = false }
-	fun onSelectActivity(activity: ActivityItem?) { _selectedActivity.value = activity }
-	fun onDeleteDialogShow() { _showDeleteDialog.value = true }
-	fun onDeleteDialogDismiss() { _showDeleteDialog.value = false }
-	fun onEditDialogShow() { _showEditDialog.value = true }
-	fun onEditDialogDismiss() { _showEditDialog.value = false }
-	fun onTimePickerShow() { _showTimePickerDialog.value = true }
-	fun onTimePickerDismiss() { _showTimePickerDialog.value = false }
+	fun onAddActivityClick() {
+		_showAddActivityDialog.value = true
+	}
+
+	fun onAddActivityDismiss() {
+		_showAddActivityDialog.value = false
+	}
+
+	fun onSelectActivity(activity: ActivityItem?) {
+		_selectedActivity.value = activity
+	}
+
+	fun onDeleteDialogShow() {
+		_showDeleteDialog.value = true
+	}
+
+	fun onDeleteDialogDismiss() {
+		_showDeleteDialog.value = false
+	}
+
+	fun onEditDialogShow() {
+		_showEditDialog.value = true
+	}
+
+	fun onEditDialogDismiss() {
+		_showEditDialog.value = false
+	}
+
+	fun onTimePickerShow() {
+		_showTimePickerDialog.value = true
+	}
+
+	fun onTimePickerDismiss() {
+		_showTimePickerDialog.value = false
+	}
 
 	fun addActivity(activityItem: ActivityItem) = viewModelScope.launch {
 		when {
