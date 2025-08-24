@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
-    id("dagger.hilt.android.plugin")
     id("com.adarshr.test-logger") version "4.0.0"
 }
 
@@ -53,7 +52,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-	implementation(libs.play.services.fitness)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -67,15 +65,9 @@ dependencies {
 
 
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.57")
+    implementation("com.google.dagger:hilt-android:2.57.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    ksp("com.google.dagger:hilt-android-compiler:2.57")
-
-    // Fragment
-    implementation ("androidx.navigation:navigation-fragment-ktx:2.9.3")
-
-    // Navigation
-    implementation ("androidx.navigation:navigation-ui-ktx:2.9.3")
+    ksp("com.google.dagger:hilt-android-compiler:2.57.1")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
