@@ -1,6 +1,6 @@
 package com.example.goalflow.ui.activity
 
-import TimePickerDialog
+import com.example.goalflow.ui.components.TimePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.hilt.navigation.compose.hiltViewModel

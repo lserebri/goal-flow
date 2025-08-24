@@ -35,7 +35,6 @@ class HomeViewModel @Inject constructor(
 	}.map<Int, ScoreUiState>(::Success)
 		.catch { error ->
 			emit(Error(error))
-			emit(Error(error))
 		}
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
 

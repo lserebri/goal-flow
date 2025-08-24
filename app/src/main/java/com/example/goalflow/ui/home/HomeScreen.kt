@@ -98,8 +98,24 @@ fun HomeScreen(
 	val showAddActivityDialog by activityViewModel.showAddActivityDialog.collectAsState()
 
 
-	if (uiState is ScoreUiState.Success) {
-		val score = (uiState as ScoreUiState.Success).data
+
+	when (uiState) {
+		is ScoreUiState.Loading -> {
+			Scaffold { contentPadding ->
+				Box(modifier = Modifier.padding(contentPadding).fillMaxSize(), contentAlignment = Alignment.Center) {
+					Text("Loading…")
+				}
+			}
+		}
+		is ScoreUiState.Error -> {
+			Scaffold { contentPadding ->
+				Box(modifier = Modifier.padding(contentPadding).fillMaxSize(), contentAlignment = Alignment.Center) {
+					Text("Failed to load score")
+				}
+			}
+		}
+		is ScoreUiState.Success -> {
+			val score = (uiState as ScoreUiState.Success).data
 
 		Scaffold { contentPadding ->
 			Box(
@@ -142,6 +158,7 @@ fun HomeScreen(
 				)
 				activityViewModel.onAddActivityDismiss()
 			})
+		}
 	}
 }
 
