@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.goalflow.data.activity.ActivityItem
 
-@Entity(tableName = "distraction")
+@Entity(tableName = "distractions")
 data class Distraction(
     @PrimaryKey(autoGenerate = true)
     override val id: Int = 0,

@@ -14,8 +14,8 @@ interface GoalDao: ActivityDao<Goal> {
     override fun getAll(): Flow<List<Goal>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override suspend fun insert(goal: Goal)
+    override suspend fun insert(activity: Goal)
 
     @Delete
-    override suspend fun delete(goal: Goal)
+    override suspend fun delete(activity: Goal)
 }
