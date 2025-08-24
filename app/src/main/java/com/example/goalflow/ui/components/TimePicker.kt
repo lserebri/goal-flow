@@ -119,10 +119,9 @@ fun TimePickerDialog(
 		Card(
 			modifier = Modifier
 				.width(280.dp)
+				.padding(start = 16.dp, end = 16.dp)
 				.wrapContentHeight(),
-			shape = RoundedCornerShape(30.dp)
-
-
+			shape = RoundedCornerShape(40.dp)
 		) {
 			Column(
 				modifier = Modifier
@@ -137,7 +136,7 @@ fun TimePickerDialog(
 						horizontalAlignment = Alignment.CenterHorizontally,
 					) {
 						TextButton(onClick = onDismiss) {
-							Text("H", fontSize = 18.sp)
+							Text("Hours", fontSize = 18.sp)
 						}
 					}
 					Column(
@@ -147,7 +146,7 @@ fun TimePickerDialog(
 						TextButton(onClick = {
 							onConfirm(selectedHour.intValue, selectedMinute.intValue)
 						}) {
-							Text("M", fontSize = 18.sp)
+							Text("Minutes", fontSize = 18.sp)
 						}
 					}
 				}

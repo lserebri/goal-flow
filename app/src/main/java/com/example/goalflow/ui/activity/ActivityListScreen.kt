@@ -240,14 +240,12 @@ fun ActivityComposable(
 				modifier = Modifier.weight(1f),
 				onClick = { onEditClick(activity) },
 				backgroundColor = Color.Transparent,
-				tint = Color.DarkGray,
 				icon = Icons.Default.Edit
 			)
 			ActionIcon(
 				modifier = Modifier.weight(1f),
 				onClick = { onDeleteClick(activity) },
 				backgroundColor = Color.Transparent,
-				tint = Color.DarkGray,
 				icon = Icons.Default.Delete
 			)
 		}
