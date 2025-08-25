@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing -->
+    <dimen name="spacing_small">4dp</dimen>
+    <dimen name="spacing_medium">8dp</dimen>
+    <dimen name="spacing_large">16dp</dimen>
+    <dimen name="spacing_xlarge">24dp</dimen>
+    <dimen name="spacing_xxlarge">32dp</dimen>
+    
+    <!-- Card dimensions -->
+    <dimen name="card_corner_radius">12dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_min_height">100dp</dimen>
+    
+    <!-- Button dimensions -->
+    <dimen name="button_corner_radius">16dp</dimen>
+    <dimen name="fab_corner_radius">16dp</dimen>
+    <dimen name="action_button_size">48dp</dimen>
+    
+    <!-- Text sizes -->
+    <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_xlarge">24sp</dimen>
+    <dimen name="score_text_size">60sp</dimen>
+    
+    <!-- Icon sizes -->
+    <dimen name="icon_size_small">16dp</dimen>
+    <dimen name="icon_size_medium">24dp</dimen>
+    <dimen name="icon_size_large">32dp</dimen>
+    
+    <!-- Time picker -->
+    <dimen name="time_picker_item_height">60dp</dimen>
+    <dimen name="time_picker_dialog_corner_radius">40dp</dimen>
+    
+    <!-- Activity list -->
+    <dimen name="activity_item_spacing">2dp</dimen>
+</resources>
