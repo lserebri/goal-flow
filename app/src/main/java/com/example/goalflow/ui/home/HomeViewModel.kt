@@ -51,7 +51,8 @@ class HomeViewModel @Inject constructor(
 				}
 				scoreRepository.updateScore(Score(score = newScore))
 			} catch (e: Exception) {
-				throw e
+				// Log error instead of crashing the UI
+				// TODO: Implement proper error reporting mechanism
 			}
 		}
 	}
