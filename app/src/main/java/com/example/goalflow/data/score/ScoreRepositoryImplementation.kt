@@ -1,6 +1,6 @@
 package com.example.goalflow.data.score
 
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
 class ScoreRepositoryImplementation @Inject constructor(

@@ -31,7 +31,7 @@ object AppModule {
 			GoalFlowDatabase::class.java,
 			"goalflow_db"
 		)
-			.fallbackToDestructiveMigration()
+			.fallbackToDestructiveMigration(false)
 			.build()
 	}
 
