@@ -51,6 +51,7 @@ fun ActivityTabPager(
 	}
 	LaunchedEffect(pagerState.currentPage) {
 		selectedTab = pagerState.currentPage
+		setActiveActivityTab(tabItems[pagerState.currentPage].type)
 	}
 
 	Column(modifier = modifier) {
