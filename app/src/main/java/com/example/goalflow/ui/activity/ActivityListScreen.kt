@@ -95,7 +95,7 @@ private fun ActivityTimePickerDialogHandler(
 fun ActivityListScreen(
 	activityViewModel: ActivityViewModel, homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-	// Call loadActivities() once when the screen is first composed
+	// Calls loadActivities() once when the screen is first composed
 	LaunchedEffect(Unit) {
 		activityViewModel.loadActivities()
 	}
