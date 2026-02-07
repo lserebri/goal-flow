@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.goalflow"
+    namespace = "lserebri.goalflow"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.goalflow"
+        applicationId = "lserebri.goalflow"
         minSdk = 28
         targetSdk = 35
         versionCode = 1
@@ -34,9 +36,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+	kotlin {
+		compilerOptions {
+			jvmTarget = JvmTarget.JVM_17
+		}
+	}
     buildFeatures {
         compose = true
         buildConfig = true
@@ -44,41 +48,45 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+	// Core Android
+	implementation(libs.androidx.core.ktx)
+	implementation(libs.androidx.lifecycle.runtime.ktx)
+	implementation(libs.androidx.activity.compose)
 
+	// Compose
+	implementation(platform(libs.androidx.compose.bom))
+	implementation(libs.androidx.ui)
+	implementation(libs.androidx.ui.graphics)
+	implementation(libs.androidx.ui.tooling.preview)
+	implementation(libs.androidx.material3)
+	implementation(libs.androidx.compose.material.icons.extended)
+
+	// Dependency Injection - Hilt
+	implementation(libs.hilt.android)
+	implementation(libs.androidx.hilt.navigation.compose)
+	ksp(libs.hilt.android.compiler)
+
+	// Coroutines
+	implementation(libs.kotlinx.coroutines.android)
+
+	// Database - Room
+	implementation(libs.room.runtime)
+	implementation(libs.room.ktx)
+	ksp(libs.room.compiler)
+
+	// Unit Tests
 	testImplementation(libs.junit)
-    testImplementation("io.mockk:mockk:1.14.5")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+	testImplementation(libs.mockk)
+	testImplementation(libs.kotlinx.coroutines.test)
+	testImplementation(kotlin("test"))
 
+	// Android Instrumentation Tests
+	androidTestImplementation(libs.androidx.junit)
+	androidTestImplementation(libs.androidx.espresso.core)
+	androidTestImplementation(platform(libs.androidx.compose.bom))
+	androidTestImplementation(libs.androidx.ui.test.junit4)
 
-    // Hilt
-    implementation("com.google.dagger:hilt-android:2.57.1")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    ksp("com.google.dagger:hilt-android-compiler:2.57.1")
-
-    // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
-
-    // Room
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.room.compiler)
-
-
-
-    implementation ("androidx.compose.material:material-icons-extended")
-    testImplementation(kotlin("test"))
+	// Debug Dependencies
+	debugImplementation(libs.androidx.ui.tooling)
+	debugImplementation(libs.androidx.ui.test.manifest)
 }
