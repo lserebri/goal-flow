@@ -25,7 +25,7 @@ fun ActivityDialog(
 
 	val weightNum = weight.toIntOrNull()
 
-	val isWeightValid = weightNum != null && weightNum in 1..10
+	val isWeightValid = weightNum != null && weightNum in 0..10
 	val isFormValid = isWeightValid
 
 	AlertDialog(
