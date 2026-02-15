@@ -64,6 +64,7 @@ dependencies {
 	// Dependency Injection - Hilt
 	implementation(libs.hilt.android)
 	implementation(libs.androidx.hilt.navigation.compose)
+	implementation(libs.androidx.compose.animation.core)
 	ksp(libs.hilt.android.compiler)
 
 	// Coroutines
