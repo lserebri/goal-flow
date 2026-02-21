@@ -3,7 +3,7 @@
 A productivity tracker that gamifies time management. You create goals (good habits) and distractions (bad habits), log time spent on each, and earn or lose XP accordingly. The app uses exponential level progression-early levels come quick, higher levels take real effort.
 
 ## Demo
-
+[screen_recording.webm](https://github.com/user-attachments/assets/db15001d-9d9c-49cc-8569-8e43c8c12016)
 
 ## Tech Stack
 
