@@ -57,5 +57,6 @@ fun DeleteConfirmationDialog(
 		},
 		text = {
 			Text(text = dialogSubTitle)
-		})
+		}
+	)
 }

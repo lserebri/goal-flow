@@ -37,8 +37,7 @@ fun ActivityDialog(
 					value = name,
 					singleLine = true,
 					onValueChange = { name = it },
-					label = { Text("Name") }
-				)
+					label = { Text("Name") })
 				OutlinedTextField(
 					value = if (weight == "0") "" else weight,
 					placeholder = { Text("1... 10") },
@@ -57,8 +56,7 @@ fun ActivityDialog(
 				onClick = {
 					val weightValue = weight.toIntOrNull() ?: 1
 					onSave(name, weightValue)
-				},
-				enabled = isFormValid
+				}, enabled = isFormValid
 			) {
 				Text("Save")
 			}
@@ -67,6 +65,5 @@ fun ActivityDialog(
 			TextButton(onClick = onDismiss) {
 				Text("Cancel")
 			}
-		}
-	)
+		})
 }

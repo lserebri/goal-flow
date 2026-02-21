@@ -4,16 +4,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import lserebri.goalflow.data.score.Score
-import lserebri.goalflow.data.score.ScoreRepository
-import lserebri.goalflow.ui.home.ScoreUiState.*
+import lserebri.goalflow.data.level.LevelCalculator
+import lserebri.goalflow.data.level.LevelInfo
+import lserebri.goalflow.data.progress.UserProgress
+import lserebri.goalflow.data.progress.UserProgressRepository
+import lserebri.goalflow.ui.home.ProgressUiState.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-	private val scoreRepository: ScoreRepository,
+	private val userProgressRepository: UserProgressRepository,
 ) : ViewModel() {
 	private val _currentActivityTab = mutableStateOf(ActivityTabType.GOALS)
 	val currentActivityTab: State<ActivityTabType> = _currentActivityTab
@@ -30,37 +30,44 @@ class HomeViewModel @Inject constructor(
 		_currentActivityTab.value = newType
 	}
 
-	val score: StateFlow<ScoreUiState> = flow {
-		emitAll(scoreRepository.getScore())
-	}.map<Int, ScoreUiState>(::Success)
+	val progress: StateFlow<ProgressUiState> = userProgressRepository.getUserProgress()
+		.map<UserProgress?, ProgressUiState> { userProgress ->
+			val progress = userProgress ?: UserProgress()
+			val levelInfo = LevelCalculator.getLevelInfo(progress.level, progress.xp)
+			Success(levelInfo)
+		}
 		.catch { error ->
 			emit(Error(error))
 		}
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
 
 
-	fun updateScore(minutes: Int, weight: Int, isGoal: Boolean) {
+	fun updateProgress(minutes: Int, weight: Int, isGoal: Boolean) {
 		viewModelScope.launch {
 			try {
-				val currentScore = scoreRepository.getScore().first()
-				val deltaPoints = ((minutes.toFloat() / 60f) * weight).toInt()
-				val newScore = if (isGoal) {
-					currentScore + deltaPoints
-				} else {
-					(currentScore - deltaPoints).coerceAtLeast(0)
-				}
-				scoreRepository.updateScore(Score(score = newScore))
+				val currentProgress = userProgressRepository.getUserProgress().first() ?: UserProgress()
+				val xpDelta = LevelCalculator.calculateXpGain(minutes, weight)
+
+				val (newLevel, newXp) = LevelCalculator.applyXpChange(
+					currentLevel = currentProgress.level,
+					currentXp = currentProgress.xp,
+					xpDelta = xpDelta,
+					isGain = isGoal
+				)
+
+				userProgressRepository.updateUserProgress(
+					UserProgress(level = newLevel, xp = newXp)
+				)
 			} catch (e: Exception) {
 				// Log error instead of crashing the UI
-				// TODO: Implement proper error reporting mechanism
 			}
 		}
 	}
 }
 
 
-sealed interface ScoreUiState {
-	object Loading : ScoreUiState
-	data class Error(val throwable: Throwable) : ScoreUiState
-	data class Success(val data: Int?) : ScoreUiState
+sealed interface ProgressUiState {
+	object Loading : ProgressUiState
+	data class Error(val throwable: Throwable) : ProgressUiState
+	data class Success(val levelInfo: LevelInfo) : ProgressUiState
 }

@@ -10,9 +10,9 @@ import lserebri.goalflow.data.distraction.DistractionDao
 import lserebri.goalflow.data.distraction.DistractionRepository
 import lserebri.goalflow.data.goal.Goal
 import lserebri.goalflow.data.goal.GoalRepository
-import lserebri.goalflow.data.score.ScoreRepositoryImplementation
-import lserebri.goalflow.data.score.ScoreDao
-import lserebri.goalflow.data.score.ScoreRepository
+import lserebri.goalflow.data.progress.UserProgressDao
+import lserebri.goalflow.data.progress.UserProgressRepository
+import lserebri.goalflow.data.progress.UserProgressRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,11 +58,11 @@ object AppModule {
 	}
 
 	@Provides
-	fun provideScoreDao(db: GoalFlowDatabase): ScoreDao = db.scoreDao()
+	fun provideUserProgressDao(db: GoalFlowDatabase): UserProgressDao = db.userProgressDao()
 
 	@Provides
 	@Singleton
-	fun provideScoreRepository(dao: ScoreDao): ScoreRepository {
-		return ScoreRepositoryImplementation(dao)
+	fun provideUserProgressRepository(dao: UserProgressDao): UserProgressRepository {
+		return UserProgressRepositoryImpl(dao)
 	}
 }

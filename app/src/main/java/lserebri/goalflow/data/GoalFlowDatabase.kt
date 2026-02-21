@@ -6,16 +6,16 @@ import lserebri.goalflow.data.distraction.Distraction
 import lserebri.goalflow.data.distraction.DistractionDao
 import lserebri.goalflow.data.goal.Goal
 import lserebri.goalflow.data.goal.GoalDao
-import lserebri.goalflow.data.score.Score
-import lserebri.goalflow.data.score.ScoreDao
+import lserebri.goalflow.data.progress.UserProgress
+import lserebri.goalflow.data.progress.UserProgressDao
 
 @Database(
-	entities = [Goal::class, Distraction::class, Score::class],
-	version = 3,
+	entities = [Goal::class, Distraction::class, UserProgress::class],
+	version = 4,
 	exportSchema = false
 )
 abstract class GoalFlowDatabase : RoomDatabase() {
 	abstract fun goalDao(): GoalDao
 	abstract fun distractionDao(): DistractionDao
-	abstract fun scoreDao(): ScoreDao
+	abstract fun userProgressDao(): UserProgressDao
 }

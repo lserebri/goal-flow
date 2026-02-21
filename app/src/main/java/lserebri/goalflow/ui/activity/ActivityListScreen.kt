@@ -152,10 +152,10 @@ fun ActivityListScreen(
 	ActivityTimePickerDialogHandler(
 		show = showTimePickerDialog,
 		onDismiss = { activityViewModel.onTimePickerDismiss() },
-		onConfirm = { hour, minute ->
+		onConfirm = { hours, minutes ->
 			selectedActivity?.let {
-				homeViewModel.updateScore(
-					(hour * 60 + minute), it.weight, isGoal = activityViewModel.isGoal
+				homeViewModel.updateProgress(
+					(hours * 60 + minutes), it.weight, isGoal = activityViewModel.isGoal
 				)
 			}
 			activityViewModel.onTimePickerDismiss()

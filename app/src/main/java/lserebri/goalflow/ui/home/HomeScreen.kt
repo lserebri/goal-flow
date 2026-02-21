@@ -32,6 +32,7 @@ import lserebri.goalflow.data.goal.Goal
 import lserebri.goalflow.ui.activity.ActivityListScreen
 import lserebri.goalflow.ui.activity.provideActivityViewModel
 import lserebri.goalflow.ui.components.ActivityDialog
+import lserebri.goalflow.ui.components.CircularProgressBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,13 +69,11 @@ fun ActivityTabPager(
 }
 
 @Composable
-fun ScoreComposable(modifier: Modifier, score: String) {
+fun LevelProgressComposable(modifier: Modifier, level: Int, progress: Float) {
 	Box(
 		modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center
 	) {
-		Text(
-			text = score, style = MaterialTheme.typography.headlineLarge, fontSize = 60.sp
-		)
+		CircularProgressBar(percentage = progress, number = level)
 	}
 }
 
@@ -92,16 +91,14 @@ private fun AddActivityDialogHandler(
 fun HomeScreen(
 	homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
-	val uiState by homeViewModel.score.collectAsState()
+	val uiState by homeViewModel.progress.collectAsState()
 
 	val activityViewModel = provideActivityViewModel(homeViewModel.currentActivityTab.value)
 
 	val showAddActivityDialog by activityViewModel.showAddActivityDialog.collectAsState()
 
-
-
 	when (uiState) {
-		is ScoreUiState.Loading -> {
+		is ProgressUiState.Loading -> {
 			Scaffold { contentPadding ->
 				Box(
 					modifier = Modifier
@@ -114,7 +111,7 @@ fun HomeScreen(
 			}
 		}
 
-		is ScoreUiState.Error -> {
+		is ProgressUiState.Error -> {
 			Scaffold { contentPadding ->
 				Box(
 					modifier = Modifier
@@ -122,13 +119,13 @@ fun HomeScreen(
 						.fillMaxSize(),
 					contentAlignment = Alignment.Center
 				) {
-					Text("Failed to load score")
+					Text("Failed to load progress")
 				}
 			}
 		}
 
-		is ScoreUiState.Success -> {
-			val score = (uiState as ScoreUiState.Success).data
+		is ProgressUiState.Success -> {
+			val levelInfo = (uiState as ProgressUiState.Success).levelInfo
 
 			Scaffold { contentPadding ->
 				Box(
@@ -141,7 +138,11 @@ fun HomeScreen(
 							.fillMaxSize()
 							.padding(10.dp)
 					) {
-						ScoreComposable(modifier = Modifier.weight(1f), score.toString())
+						LevelProgressComposable(
+							modifier = Modifier.weight(1f),
+							level = levelInfo.level,
+							progress = levelInfo.currentLevelProgress
+						)
 						ActivityTabPager(
 							Modifier.weight(2f),
 							setActiveActivityTab = homeViewModel::setCurrentActivityTab
@@ -174,7 +175,3 @@ fun HomeScreen(
 		}
 	}
 }
-
-
-
-

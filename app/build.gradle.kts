@@ -65,6 +65,11 @@ dependencies {
 	implementation(libs.hilt.android)
 	implementation(libs.androidx.hilt.navigation.compose)
 	implementation(libs.androidx.compose.animation.core)
+	implementation(libs.androidx.compose.ui.graphics)
+	implementation(libs.androidx.compose.foundation)
+	implementation(libs.androidx.compose.foundation.layout)
+	implementation(libs.androidx.compose.material3)
+	implementation(libs.androidx.compose.ui)
 	ksp(libs.hilt.android.compiler)
 
 	// Coroutines

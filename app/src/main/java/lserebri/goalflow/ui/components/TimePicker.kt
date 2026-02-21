@@ -28,25 +28,17 @@ import kotlin.collections.toList
 @Preview(showBackground = true, apiLevel = 35)
 @Composable
 fun TimePickerDialogPreview() {
-	TimePickerDialog(
-		initialHour = 0,
-		initialMinute = 0,
-		onDismiss = { },
-		onConfirm = { _, _ -> }
-	)
+	TimePickerDialog(initialHour = 0, initialMinute = 0, onDismiss = { }, onConfirm = { _, _ -> })
 }
 
 @Composable
 private fun TrackTimeWheelSelection(
-	listState: LazyListState,
-	values: List<Int>,
-	onSelectionChanged: (Int) -> Unit
+	listState: LazyListState, values: List<Int>, onSelectionChanged: (Int) -> Unit
 ) {
 	LaunchedEffect(listState) {
-		snapshotFlow { listState.layoutInfo }
-			.collect { layoutInfo ->
-				val center = layoutInfo.viewportStartOffset +
-						(layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset) / 2
+		snapshotFlow { listState.layoutInfo }.collect { layoutInfo ->
+				val center =
+					layoutInfo.viewportStartOffset + (layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset) / 2
 
 				val centerItem = layoutInfo.visibleItemsInfo.minByOrNull { item ->
 					kotlin.math.abs((item.offset + item.size / 2) - center)
@@ -104,14 +96,12 @@ fun TimePickerDialog(
 	TrackTimeWheelSelection(
 		listState = hourListState,
 		values = totalHours,
-		onSelectionChanged = { selectedHour.intValue = it }
-	)
+		onSelectionChanged = { selectedHour.intValue = it })
 
 	TrackTimeWheelSelection(
 		listState = minuteListState,
 		values = totalMinutes,
-		onSelectionChanged = { selectedMinute.intValue = it }
-	)
+		onSelectionChanged = { selectedMinute.intValue = it })
 
 	Dialog(
 		onDismissRequest = onDismiss
@@ -120,12 +110,10 @@ fun TimePickerDialog(
 			modifier = Modifier
 				.width(280.dp)
 				.padding(start = 16.dp, end = 16.dp)
-				.wrapContentHeight(),
-			shape = RoundedCornerShape(40.dp)
+				.wrapContentHeight(), shape = RoundedCornerShape(40.dp)
 		) {
 			Column(
-				modifier = Modifier
-					.fillMaxWidth(),
+				modifier = Modifier.fillMaxWidth(),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
 				Row(
@@ -150,12 +138,8 @@ fun TimePickerDialog(
 						}
 					}
 				}
-
-//				Spacer(modifier = Modifier.height(16.dp))
-
 				Row(
-					modifier = Modifier
-						.fillMaxWidth(),
+					modifier = Modifier.fillMaxWidth(),
 					horizontalArrangement = Arrangement.Center,
 					verticalAlignment = Alignment.CenterVertically
 				) {
@@ -172,8 +156,6 @@ fun TimePickerDialog(
 						modifier = Modifier.weight(1f)
 					)
 				}
-
-//				Spacer(modifier = Modifier.height(24.dp))
 
 				Row(
 					modifier = Modifier.fillMaxWidth(),
@@ -216,8 +198,7 @@ private fun TimeColumn(
 		LazyColumn(
 			state = lazyListState,
 			contentPadding = PaddingValues(
-				top = rowHeight / 2,
-				bottom = rowHeight / 2
+				top = rowHeight / 2, bottom = rowHeight / 2
 			),
 			verticalArrangement = Arrangement.Center,
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -228,8 +209,7 @@ private fun TimeColumn(
 				val isSelected = value == selectedValue
 
 				val animatedFontSize by animateFloatAsState(
-					targetValue = if (isSelected) 24f else 18f,
-					label = "FontSizeAnim"
+					targetValue = if (isSelected) 24f else 18f, label = "FontSizeAnim"
 				)
 
 				val animatedColor by animateColorAsState(
@@ -261,15 +241,4 @@ private fun TimeColumn(
 				.border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
 		)
 	}
-}
-
-
-@Composable
-fun TimePickerPreview() {
-	TimePickerDialog(
-		initialHour = 0,
-		initialMinute = 0,
-		onDismiss = { },
-		onConfirm = { _, _ -> }
-	)
 }
