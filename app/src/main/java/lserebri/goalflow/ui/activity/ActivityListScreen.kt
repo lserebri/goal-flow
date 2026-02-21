@@ -21,6 +21,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.RocketLaunch
+import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -41,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import lserebri.goalflow.data.activity.ActivityItem
@@ -105,21 +108,25 @@ fun ActivityListScreen(
 
 	val activityUIList by activityViewModel.activities.collectAsState()
 
-	ActivityListComposable(
-		activityUIList,
-		onEditClick = {
-			activityViewModel.onSelectActivity(it)
-			activityViewModel.onEditDialogShow()
-		},
-		onDeleteClick = {
-			activityViewModel.onSelectActivity(it)
-			activityViewModel.onDeleteDialogShow()
-		},
-		onActivityClick = {
-			activityViewModel.onSelectActivity(it)
-			activityViewModel.onTimePickerShow()
-		},
-	)
+	if (activityUIList.isEmpty()) {
+		EmptyActivityState(isGoal = activityViewModel.isGoal)
+	} else {
+		ActivityListComposable(
+			activityUIList,
+			onEditClick = {
+				activityViewModel.onSelectActivity(it)
+				activityViewModel.onEditDialogShow()
+			},
+			onDeleteClick = {
+				activityViewModel.onSelectActivity(it)
+				activityViewModel.onDeleteDialogShow()
+			},
+			onActivityClick = {
+				activityViewModel.onSelectActivity(it)
+				activityViewModel.onTimePickerShow()
+			},
+		)
+	}
 
 	val showDeleteDialog by activityViewModel.showDeleteDialog.collectAsState()
 	val selectedActivity by activityViewModel.selectedActivity.collectAsState()
@@ -163,6 +170,36 @@ fun ActivityListScreen(
 			}
 			activityViewModel.onTimePickerDismiss()
 		})
+}
+
+@Composable
+private fun EmptyActivityState(isGoal: Boolean) {
+	Column(
+		modifier = Modifier.fillMaxSize(),
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.Center,
+	) {
+		Icon(
+			imageVector = if (isGoal) Icons.Outlined.RocketLaunch else Icons.Outlined.SportsEsports,
+			contentDescription = null,
+			modifier = Modifier.size(64.dp),
+			tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+		)
+		Spacer(modifier = Modifier.height(16.dp))
+		Text(
+			text = if (isGoal) "No goals yet" else "No distractions yet",
+			style = MaterialTheme.typography.titleMedium,
+			color = MaterialTheme.colorScheme.onSurface,
+		)
+		Spacer(modifier = Modifier.height(4.dp))
+		Text(
+			text = if (isGoal) "Tap + to add your first goal"
+			else "Tap + to track what slows you down",
+			style = MaterialTheme.typography.bodyMedium,
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			textAlign = TextAlign.Center,
+		)
+	}
 }
 
 @Composable

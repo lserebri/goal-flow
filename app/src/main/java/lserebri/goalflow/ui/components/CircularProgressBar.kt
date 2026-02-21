@@ -7,6 +7,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -149,14 +150,29 @@ private fun CircularProgressContent(
 				style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
 			)
 		}
-		Text(
-			text = level.toString(),
-			fontWeight = FontWeight.Bold,
-			fontSize = (radius.value * 0.38f).sp,
-			modifier = Modifier.graphicsLayer {
-				scaleX = scale
-				scaleY = scale
-			}
-		)
+		Column(horizontalAlignment = Alignment.CenterHorizontally) {
+			Text(
+				text = "LEVEL",
+				fontSize = (radius.value * 0.13f).sp,
+				fontWeight = FontWeight.Medium,
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
+				letterSpacing = (radius.value * 0.025f).sp,
+			)
+			Text(
+				text = level.toString(),
+				fontWeight = FontWeight.Bold,
+				fontSize = (radius.value * 0.38f).sp,
+				modifier = Modifier.graphicsLayer {
+					scaleX = scale
+					scaleY = scale
+				}
+			)
+			Text(
+				text = "${(circleProgress * 100).toInt()}% XP",
+				fontSize = (radius.value * 0.13f).sp,
+				fontWeight = FontWeight.Normal,
+				color = MaterialTheme.colorScheme.primary,
+			)
+		}
 	}
 }

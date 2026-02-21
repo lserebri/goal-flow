@@ -37,7 +37,7 @@ fun ActivityDialog(
 					value = name,
 					singleLine = true,
 					onValueChange = { name = it },
-					label = { Text("Name") })
+					label = { Text("Name of the activity") })
 				OutlinedTextField(
 					value = if (weight == "0") "" else weight,
 					placeholder = { Text("1... 10") },
