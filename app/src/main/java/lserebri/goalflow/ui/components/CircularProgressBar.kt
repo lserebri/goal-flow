@@ -60,12 +60,18 @@ private fun rememberProgressAnimation(
 	durationPerLevel: Int
 ): Float {
 
-	val animatable = remember { Animatable(0f) }
+	val animatable = remember { Animatable(target) }
+	var isFirstRun by remember { mutableStateOf(true) }
 
 	LaunchedEffect(target) {
 
-		val distance = target - animatable.value
+		if (isFirstRun) {
+			animatable.snapTo(target)
+			isFirstRun = false
+			return@LaunchedEffect
+		}
 
+		val distance = target - animatable.value
 		if (distance == 0f) return@LaunchedEffect
 
 		animatable.animateTo(
@@ -87,8 +93,15 @@ private fun rememberLevelPopAnimation(
 
 	val scaleAnim = remember { Animatable(1f) }
 	var previousLevel by remember { mutableStateOf(currentLevel) }
+	var isFirstRun by remember { mutableStateOf(true) }
 
 	LaunchedEffect(currentLevel) {
+
+		if (isFirstRun) {
+			previousLevel = currentLevel
+			isFirstRun = false
+			return@LaunchedEffect
+		}
 
 		if (currentLevel != previousLevel) {
 
@@ -110,7 +123,6 @@ private fun rememberLevelPopAnimation(
 
 	return scaleAnim.value
 }
-
 @Composable
 private fun CircularProgressContent(
 	level: Int, circleProgress: Float, scale: Float, radius: Dp, strokeWidth: Dp
