@@ -1,6 +1,7 @@
 package lserebri.goalflow.ui.home
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -70,10 +71,17 @@ fun ActivityTabPager(
 
 @Composable
 fun LevelProgressComposable(modifier: Modifier, level: Int, progress: Float) {
-	Box(
+	BoxWithConstraints(
 		modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center
 	) {
-		CircularProgressBar(percentage = progress, number = level)
+		val radius = minOf(maxWidth, maxHeight) * 0.4f
+		val strokeWidth = radius / 7
+		CircularProgressBar(
+			percentage = progress,
+			number = level,
+			radius = radius,
+			strokeWidth = strokeWidth
+		)
 	}
 }
 
@@ -144,7 +152,7 @@ fun HomeScreen(
 							progress = levelInfo.currentLevelProgress
 						)
 						ActivityTabPager(
-							Modifier.weight(2f),
+							Modifier.weight(1.5f),
 							setActiveActivityTab = homeViewModel::setCurrentActivityTab
 						)
 					}
